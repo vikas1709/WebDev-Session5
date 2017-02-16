@@ -4,13 +4,7 @@ const app = express()
 const port = 9000
 
 // app.use(express.static('public'))
-
-app.use(bodyParser.urlencoded({extended: true}))
-
-MongoClient.connect('mongodb://dannyboynyc:dd2345@ds149329.mlab.com:49329/bcl2', (err, database) => {
-	db = database
-
-})
+// app.use(bodyParser.urlencoded({extended: true}))
 
 app.listen(port, () => {
 	console.log(`Listening on port ${port}!`)
