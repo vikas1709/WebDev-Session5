@@ -1,60 +1,202 @@
 #Session 5 (placeholder only)
 
-app.get('/recipes', (req, res) => {
-    res.sendFile(__dirname + '/public/recipes.html')
-})
+##Components
 
-
-<div class="panel panel2 active">
-   <a href="recipes">Recipes</a>
-</div>
-
-
-<script src="https://code.angularjs.org/1.5.8/angular.js"></script>
-
-`var app = angular.module('foodApp', []);``
-
-<nav ng-include=" 'includes/nav.html' "></nav>
-
-```
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html')
-})
-
-app.get('/recipes', (req, res) => {
-    res.sendFile(__dirname + '/public/recipes.html')
-})
-```
-
+Set up a simple html page bootstrapped with Angular:
 
 ```
 <!DOCTYPE html>
-<html lang="en" ng-app="recipeApp">
+<html>
+
 <head>
-  <meta charset="UTF-8">
-  <title>Recipes</title>
-  <script src="https://code.angularjs.org/1.6.1/angular.js"></script>
-  <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
-  <link rel="stylesheet" href="/css/styles.css">
+    <title>AngularJS Module</title>
+    <script src="https://code.angularjs.org/1.6.1/angular.js"></script>
+    <script src="test.js"></script>
 </head>
-<body class="home">
 
-  <nav ng-include=" 'includes/nav.html' "></nav>
-
-  <h1>Home</h1>
-
-  <script src="/js/scripts.js"></script>
-
+<body>
+    <div ng-app="myApp">
+        <div ng-controller="UserController">
+            <p>Hello {{ user }}
+        </div>
+    </div>
 </body>
+
 </html>
 ```
 
+test.js:
 
 ```
-<div>
-  <recipe-list></recipe-list>
+angular.module('myApp', []);
+
+angular.module('myApp').controller('UserController', function( $scope ){
+    $scope.user = 'John'
+})
+```
+
+###Create a component:
+
+```
+<body>
+    <div ng-app="myApp">
+        <greet-user></greet-user>
+    </div>
+</body>
+```
+
+Use a component which contains both the template and the controller:
+
+```
+angular.module('myApp', []);
+
+angular.module('myApp').component('greetUser', {
+    template: 'Hello, {{$ctrl.user}}!',
+    controller: function GreetUserController() {
+        this.user = 'world';
+    }
+});
+```
+
+###Create multiple components:
+
+Add a second component: 
+
+```
+angular.module('myApp').component('greetUser', {
+    template: 'Hello, {{$ctrl.user}}!',
+    controller: function GreetUserController() {
+        this.user = 'world';
+    }
+});
+
+
+angular.module('myApp').component('byeUser', {
+    template: 'Bye, {{$ctrl.user}}!',
+    controller: function ByeUserController() {
+        this.user = 'cruel world';
+    }
+});
+```
+
+```
+<body>
+    <div ng-app="myApp">
+        <greet-user></greet-user>
+        <bye-user></bye-user>
+    </div>
+</body>
+```
+
+###Add routing
+
+If we want to swap out components we use Angular for routing in a SPA, not express routing.
+
+`<script src="https://code.angularjs.org/1.6.1/angular-route.js"></script>`
+
+```
+angular.module('myApp', ['ngRoute']);
+
+angular.module('myApp').config(
+    function config($routeProvider) {
+        $routeProvider.
+        when('/', {
+            template: 'Hello, {{user}}!',
+            controller: 'GreetUserController'
+        }).
+        when('/bye', {
+            template: 'Bye, {{user}}!',
+            controller: 'ByeUserController'
+        }).
+        otherwise('/404');
+    });
+
+angular.module('myApp').controller('GreetUserController', function($scope){
+    $scope.user = 'world';
+})
+
+angular.module('myApp').controller('ByeUserController', function($scope){
+    $scope.user = 'cruel world';
+})
+```
+
+```
+<body>
+    <div ng-app="myApp">
+        <div ng-view></div>
+    </div>
+</body>
+```
+
+###Add Components
+
+```
+angular.module('myApp', [
+    'ngRoute'
+    ]);
+
+angular.module('myApp').config(
+    function config($locationProvider, $routeProvider) {
+        $locationProvider.hashPrefix('!');
+        $routeProvider.
+        when('/', {
+            template: '<greet-user></greet-user>'
+        }).
+        when('/bye', {
+            template: '<bye-user></bye-user>'
+        }).
+        otherwise('/404');
+    });
+
+angular.module('myApp').component('greetUser', {
+    template: 'Hello, {{$ctrl.user}}!',
+    controller: function GreetUserController() {
+        this.user = 'world';
+    }
+});
+
+angular.module('myApp').component('byeUser', {
+    template: 'Bye, {{$ctrl.user}}!',
+    controller: function ByeUserController() {
+        this.user = 'cruel world';
+    }
+});
+```
+
+
+##Recipe Site
+
+Examine package.json, app.js, index.html and scripts.js
+
+`sudo npm install`
+
+`npm run boom!`
+
+Allow express to use public as static:
+
+`app.use(express.static('public'))`
+
+Creating an express route? No!
+
+```
+app.get('/recipes', (req, res) => {
+    res.sendFile(__dirname + '/public/recipes.html')
+})
+```
+
+```
+<div class="panel panel2 active">
+   <a href="recipes">Recipes</a>
 </div>
 ```
+
+Routing in a spa is best done using the hash structure (no page refresh) in Angular routing, not express. 
+
+`<script src="https://code.angularjs.org/1.5.8/angular.js"></script>`
+
+`<body ng-app="foodApp">`
+
+`var app = angular.module('foodApp', []);`
 
 ```
 angular.module('foodApp').directive('navBar', function(){
@@ -112,6 +254,55 @@ angular.module('foodApp').component('recipeList', {
   }
 });
 ```
+
+```
+<div>
+  <recipe-list></recipe-list>
+</div>
+```
+
+
+
+
+
+<nav ng-include=" 'includes/nav.html' "></nav>
+
+```
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/index.html')
+})
+
+app.get('/recipes', (req, res) => {
+    res.sendFile(__dirname + '/public/recipes.html')
+})
+```
+
+
+```
+<!DOCTYPE html>
+<html lang="en" ng-app="recipeApp">
+<head>
+  <meta charset="UTF-8">
+  <title>Recipes</title>
+  <script src="https://code.angularjs.org/1.6.1/angular.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="home">
+
+  <nav ng-include=" 'includes/nav.html' "></nav>
+
+  <h1>Home</h1>
+
+  <script src="/js/scripts.js"></script>
+
+</body>
+</html>
+```
+
+
+
+
 
 ###Directive
 
