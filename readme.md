@@ -202,15 +202,33 @@ Routing in a spa is best done using the hash structure (no page refresh).
 
 ```
 angular.module('foodApp').component('recipeList', {
+    template:
+    `<h1>test</h1>`,
+    controller: function RecipeListController() {
+
+    }
+});
+```
+
+```
+<div>
+  <recipe-list></recipe-list>
+</div>
+```
+
+Add a template and data to the controller:
+
+```
+angular.module('foodApp').component('recipeList', {
   template:
   `
   <div>
   <ul>
-  <li ng-repeat="recipe in $ctrl.recipes">
-  <img ng-src="img/home/{{ recipe.image }}">
-  <h1><a href="#0">{{ recipe.title }}</a></h1>
-  <p>{{ recipe.description }}</p>
-  </li>
+      <li ng-repeat="recipe in $ctrl.recipes">
+          <img ng-src="img/home/{{ recipe.image }}">
+          <h1><a href="#0">{{ recipe.title }}</a></h1>
+          <p>{{ recipe.description }}</p>
+      </li>
   </ul>
   </div>
   `,
@@ -250,11 +268,69 @@ angular.module('foodApp').component('recipeList', {
 });
 ```
 
+Break down the elements into separate js files.
+
+js > recipes > recipes-template.html
+
+`templateUrl: 'js/recipes/recipes-template.html',`
+
+js > recipes > recipes-list.component.js
+
+js > foodapp.module.js
+
+`angular.module('foodApp', []);`
+
+###Format the recipes
+
 ```
-<div>
-  <recipe-list></recipe-list>
+<div class="wrap">
+    <ul>
+        <li ng-repeat="recipe in $ctrl.recipes">
+            <img ng-src="img/home/{{ recipe.image }}">
+            <div>
+            <h1><a href="#0">{{ recipe.title }}</a></h1>
+            <p>{{ recipe.description }}</p>
+            </div>
+        </li>
+    </ul>
 </div>
 ```
+
+styles.scss:
+
+```
+@import 'imports/panels';
+@import 'imports/recipes'; 
+```
+
+recipes.scss
+
+```
+.wrap {
+    background: #eee;
+    max-width: 940px;
+    margin: 0 auto;
+    ul {
+        list-style: none;
+    }
+    li {
+        display: flex;
+        padding: 1rem;
+        img {
+            width: 30%;
+            height:100%;
+            padding: 1rem;
+        }
+        h1 {
+            a {
+                color: #666;
+                text-decoration: none;
+            }
+        }
+    }
+}
+```
+
 
 
 
