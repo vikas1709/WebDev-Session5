@@ -90,7 +90,9 @@ angular.module('myApp').component('byeUser', {
 
 ###Add routing
 
-If we want to swap out components we use Angular for routing in a SPA, not express routing.
+If we want to swap out components we use Angular for routing in a SPA, not express routing. 
+
+Use express routes for handling data and authentication. Always include a single route for index.html. Angular routes handle the view (templates) and the logic (controllers) for the views.
 
 `<script src="https://code.angularjs.org/1.6.1/angular-route.js"></script>`
 
@@ -172,7 +174,7 @@ Examine package.json, app.js, index.html and scripts.js
 
 `npm run boom!`
 
-Allow express to use public as static:
+Allow express to use public as a source for static files and our Angular work:
 
 `app.use(express.static('public'))`
 
@@ -186,11 +188,11 @@ app.get('/recipes', (req, res) => {
 
 ```
 <div class="panel panel2 active">
-   <a href="recipes">Recipes</a>
+   <a href="/recipes">Recipes</a>
 </div>
 ```
 
-Routing in a spa is best done using the hash structure (no page refresh) in Angular routing, not express. 
+Routing in a spa is best done using the hash structure (no page refresh).
 
 `<script src="https://code.angularjs.org/1.5.8/angular.js"></script>`
 
@@ -199,13 +201,6 @@ Routing in a spa is best done using the hash structure (no page refresh) in Angu
 `var app = angular.module('foodApp', []);`
 
 ```
-angular.module('foodApp').directive('navBar', function(){
-  return {
-    scope: true,
-    templateUrl: 'includes/nav.html'
-  };
-})
-
 angular.module('foodApp').component('recipeList', {
   template:
   `
@@ -263,7 +258,16 @@ angular.module('foodApp').component('recipeList', {
 
 
 
+###Notes
 
+```
+angular.module('foodApp').directive('navBar', function(){
+  return {
+    scope: true,
+    templateUrl: 'includes/nav.html'
+  };
+})
+```
 
 <nav ng-include=" 'includes/nav.html' "></nav>
 
