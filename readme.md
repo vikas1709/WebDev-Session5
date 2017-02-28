@@ -513,6 +513,35 @@ function highlightLink() {
 triggers.forEach(panel => panel.addEventListener('mouseenter', highlightLink));
 ```
 
+```js
+function highlightLink() {
+	console.log(this)
+}
+```
+
+```js
+function highlightLink() {
+	const linkCoords = this.getBoundingClientRect();
+    console.log(linkCoords)
+}
+```
+
+```js
+function highlightLink() {
+	const linkCoords = this.getBoundingClientRect();
+    highlight.style.width = `${linkCoords.width}px`;
+    highlight.style.height = `${linkCoords.height}px`;
+}
+```
+
+```js
+function highlightLink() {
+	const linkCoords = this.getBoundingClientRect();
+    highlight.style.width = `${linkCoords.width}px`;
+    highlight.style.height = `${linkCoords.height}px`;
+    highlight.style.transform = `translate(100px, 100px)`;
+}
+```
 
 
 
