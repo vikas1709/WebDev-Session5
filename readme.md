@@ -110,7 +110,7 @@ myApp.component('byeUser', {
 
 ###Add routing
 
-If we want to swap out components we use Angular for routing a SPA, not express routing. 
+(Comment out the previous components.) If we want to swap out components we use Angular for routing a SPA, not express routing. 
 
 Use express routes for handling data and authentication. (Always include a single route for index.html.) 
 
@@ -162,7 +162,7 @@ Go to `http://localhost:3000/#!/bye`
 
 ###Add Components
 
-The routing specifies a template defined by a component.
+(Comment out the previous controllers. Uncomment the old components.) The routing specifies a template defined by a component.
 
 Hash prefixes and be set using $locationProvider (defaults to !).
 
