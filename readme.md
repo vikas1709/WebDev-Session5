@@ -1,5 +1,15 @@
 #Session 5
 
+##Homework
+
+Review the creation of components below. 
+
+1. Add an Angular route for the reviews section of the page.
+1. Create a component for the review page along with a 
+1. template that displays 4 or 5 one sentence summary reviews (restaurant images are provided in the img directory if you would like to use them)
+
+Good luck.
+
 ##Components
 
 Set up a simple html page bootstrapped with Angular (code.angularjs.org):
@@ -439,6 +449,28 @@ angular.module('foodApp').config(
   });
 ```
 
+###Filtering and Sorting (optional)
+
+```
+<ul>
+    <li>
+        <p>
+            Search: <input ng-model="$ctrl.query" />
+        </p>
+        <p>
+            Sort by:
+            <select ng-model="$ctrl.orderProp">
+                <option value="title">Alphabetical</option>
+                <option value="date">Newest</option>
+            </select>
+        </p>
+    </li>
+</ul>
+```
+
+`<li ng-repeat="recipe in $ctrl.recipes | filter:$ctrl.query | orderBy:$ctrl.orderProp">`
+
+`this.orderProp = 'date';`
 
 
 ###Notes
