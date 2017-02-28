@@ -349,6 +349,7 @@ recipes.scss
             padding: 1rem;
         }
         h1 {
+            font-family: lobster;
             a {
                 color: #666;
                 text-decoration: none;
@@ -357,6 +358,48 @@ recipes.scss
     }
 }
 ```
+
+###Routing
+
+`<script src="https://code.angularjs.org/1.6.1/angular-route.js"></script>`
+
+`<script src="js/foodapp.config.js"></script>`
+
+`<base href="/">`
+
+```
+<div class="panel panel1 active">
+  <a href="/">Home</a>
+</div>
+```
+
+`angular.module('foodApp', ['ngRoute']);`
+
+```
+angular.module('foodApp').config(
+
+  function config($locationProvider, $routeProvider) {
+    $routeProvider.
+    when('/', {
+      template: 'test'
+    }).
+    when('/recipes', {
+      template: 'test2'
+    }).
+    otherwise('/404');
+
+    $locationProvider.html5Mode(true);
+  });
+  ```
+
+```
+<div>
+  <div ng-view></div>
+</div>
+```
+
+
+
 
 
 
