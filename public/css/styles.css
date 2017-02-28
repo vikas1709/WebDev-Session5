@@ -70,16 +70,4 @@ nav {
   font-size: 2em;
   border-bottom: 4px solid #fff; }
 
-.highlight {
-  transition: all 0.2s;
-  border-bottom: 2px solid white;
-  position: absolute;
-  top: 0;
-  background: black;
-  left: 0;
-  z-index: -1;
-  display: block;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  border-bottom: 5px solid white; }
-
 /*# sourceMappingURL=styles.css.map */

@@ -7,6 +7,7 @@ Review the creation of components below.
 1. Add an Angular route for the reviews section of the page.
 1. Create a component for the review page along with a 
 1. template that displays 4 or 5 one sentence summary reviews (restaurant images are provided in the img directory if you would like to use them)
+1. Bonus - make a nice 404 page for the other items on the main nav
 
 Good luck.
 
@@ -54,7 +55,7 @@ myApp.controller('GreetUserController', $scope  =>  $scope.user = 'John' )
 
 ###Create a component
 
-Components are referenced directly in the html via custom tags:
+(Comment out the controller.) Components are referenced directly in the html via custom tags:
 
 ```html
 <div ng-app="myApp">
@@ -62,7 +63,7 @@ Components are referenced directly in the html via custom tags:
 </div>
 ```
 
-A component references an object that contains both the template and the controller. 
+A component references an object that contains both a template and a controller. 
 
 Note the use of $ctrl for components as opposed to global $scope. Here the data is exclusive to a specific controller. Also, the html uses hyphens while the component uses camel case.
 
@@ -76,6 +77,8 @@ myApp.component('greetUser', {
     }
 });
 ```
+
+Test in browser.
 
 ###Create multiple components:
 
@@ -113,6 +116,16 @@ myApp.component('byeUser', {
 (Comment out the previous components.) If we want to swap out components we use Angular for routing a SPA, not express routing. 
 
 Use express routes for handling data and authentication. (Always include a single route for index.html.) 
+
+e.g. something like this would be a bad idea:
+
+```js
+app.get('/recipes', (req, res) => {
+    res.sendFile(__dirname + '/public/recipes.html')
+})
+```
+
+Routing in a spa is best done using the hash structure (no page refresh).
 
 Angular routes handle the view (templates) and the logic (controllers) for the views.
 
@@ -214,11 +227,15 @@ html5 mode is an alternative to hashbang mode. See [this discussion](http://stac
 
 In the config:
 
+Comment out `// $locationProvider.hashPrefix('!')`
+
 `$locationProvider.html5Mode(true);`
 
 In index.html:
 
 `<base href="/">`
+
+Note the cleaner urls.
 
 
 ##Recipe Site
@@ -232,22 +249,6 @@ Examine package.json, app.js, index.html and scripts.js
 Allow express to use public as a source for static files and our Angular work:
 
 `app.use(express.static('public'))`
-
-Creating an express route? No!
-
-```js
-app.get('/recipes', (req, res) => {
-    res.sendFile(__dirname + '/public/recipes.html')
-})
-```
-
-```html
-<div class="panel panel2 active">
-   <a href="/recipes">Recipes</a>
-</div>
-```
-
-Routing in a spa is best done using the hash structure (no page refresh).
 
 `<script src="https://code.angularjs.org/1.5.8/angular.js"></script>`
 
@@ -265,8 +266,7 @@ Create `recipe-list.component.js` and link it.
 
 ```js
 angular.module('foodApp').component('recipeList', {
-    template:
-    `<h1>test</h1>`,
+    template: `<h1>test</h1>`,
     controller: function RecipeListController() {
 
     }
@@ -333,7 +333,7 @@ angular.module('foodApp').component('recipeList', {
 });
 ```
 
-Note the break down of the elements into separate js files.
+Break down the template into a separate file:
 
 js > recipes > recipe-list.template.html
 
@@ -392,7 +392,7 @@ recipes.scss
 
 ###Routing
 
-Wire up the main nav.
+Wire up the main nav. In the html:
 
 `<script src="https://code.angularjs.org/1.6.2/angular-route.js"></script>`
 
@@ -400,7 +400,11 @@ Wire up the main nav.
 
 `<base href="/">`
 
+In the module:
+
 `angular.module('foodApp', ['ngRoute']);`
+
+foodapp.config.js:
 
 ```js
 angular.module('foodApp').config(
