@@ -14,7 +14,7 @@ Good luck.
 
 Set up a simple html page bootstrapped with Angular (code.angularjs.org):
 
-```
+```html
 <!DOCTYPE html>
 <html>
 
@@ -36,7 +36,7 @@ Set up a simple html page bootstrapped with Angular (code.angularjs.org):
 
 test.js:
 
-```
+```js
 angular.module('myApp', []);
 
 angular.module('myApp').controller('GreetUserController', function( $scope ){
@@ -46,7 +46,7 @@ angular.module('myApp').controller('GreetUserController', function( $scope ){
 
 refactored:
 
-```
+```js
 var myApp = angular.module('myApp', []);
 
 myApp.controller('GreetUserController', $scope  =>  $scope.user = 'John' )
@@ -54,9 +54,9 @@ myApp.controller('GreetUserController', $scope  =>  $scope.user = 'John' )
 
 ###Create a component
 
-Components are referenced directly in the html:
+Components are referenced directly in the html via custom tags:
 
-```
+```html
 <div ng-app="myApp">
   <greet-user></greet-user>
 </div>
@@ -66,7 +66,7 @@ A component references an object that contains both the template and the control
 
 Note the use of $ctrl for components as opposed to global $scope. Here the data is exclusive to a specific controller. Also, the html uses hyphens while the component uses camel case.
 
-```
+```js
 var myApp = angular.module('myApp', []);
 
 myApp.component('greetUser', {
@@ -81,7 +81,7 @@ myApp.component('greetUser', {
 
 Add a second component: 
 
-```
+```js
 myApp.component('greetUser', {
     template: 'Hello, {{ $ctrl.user }}!',
     controller: function GreetUserController() {
@@ -98,7 +98,7 @@ myApp.component('byeUser', {
 });
 ```
 
-```
+```html
 <body>
     <div ng-app="myApp">
         <greet-user></greet-user>
@@ -118,11 +118,11 @@ Angular routes handle the view (templates) and the logic (controllers) for the v
 
 `<script src="https://code.angularjs.org/1.6.2/angular-route.js"></script>`
 
-```
+```js
 var myApp = angular.module('myApp', ['ngRoute']);
 ```
 
-```
+```js
 myApp.config(
     function config($routeProvider) {
         $routeProvider.
@@ -150,7 +150,7 @@ Because we are not using components we are back to using $scope.
 
 ng-view
 
-```
+```html
 <div ng-app="myApp">
     <div ng-view></div>
 </div>
@@ -166,7 +166,7 @@ The routing specifies a template defined by a component.
 
 Hash prefixes and be set using $locationProvider (defaults to !).
 
-```
+```js
 var myApp = angular.module('myApp', ['ngRoute']);
 
 myApp.config(
@@ -199,7 +199,7 @@ myApp.component('byeUser', {
 
 ###Linking
 
-```
+```js
 myApp.component('greetUser', {
     template: `
     <h4>Hello, {{ $ctrl.user }}!</h4>
@@ -210,6 +210,8 @@ myApp.component('greetUser', {
     }
 });
 ```
+html5 mode is an alternative to hashbang mode. See [this discussion](http://stackoverflow.com/questions/16677528/location-switching-between-html5-and-hashbang-mode-link-rewriting#16678065) on stack overflow.
+
 In the config:
 
 `$locationProvider.html5Mode(true);`
@@ -233,13 +235,13 @@ Allow express to use public as a source for static files and our Angular work:
 
 Creating an express route? No!
 
-```
+```js
 app.get('/recipes', (req, res) => {
     res.sendFile(__dirname + '/public/recipes.html')
 })
 ```
 
-```
+```html
 <div class="panel panel2 active">
    <a href="/recipes">Recipes</a>
 </div>
@@ -261,7 +263,7 @@ Create recipes folder in js.
 
 Create `recipe-list.component.js` and link it.
 
-```
+```js
 angular.module('foodApp').component('recipeList', {
     template:
     `<h1>test</h1>`,
@@ -271,7 +273,7 @@ angular.module('foodApp').component('recipeList', {
 });
 ```
 
-```
+```html
 <div>
   <recipe-list></recipe-list>
 </div>
@@ -281,7 +283,7 @@ Debug!
 
 Add a template and data to the controller:
 
-```
+```js
 angular.module('foodApp').component('recipeList', {
   template:
   `
@@ -339,7 +341,7 @@ js > recipes > recipe-list.template.html
 
 ###Format the recipes
 
-```
+```html
 <div class="wrap">
     <ul>
         <li ng-repeat="recipe in $ctrl.recipes">
@@ -361,7 +363,7 @@ styles.scss:
 
 recipes.scss
 
-```
+```css
 .wrap {
     background: #eee;
     max-width: 940px;
@@ -400,7 +402,7 @@ Wire up the main nav.
 
 `angular.module('foodApp', ['ngRoute']);`
 
-```
+```js
 angular.module('foodApp').config(
 
   function config($locationProvider, $routeProvider) {
@@ -417,13 +419,13 @@ angular.module('foodApp').config(
   });
   ```
 
-```
+```html
 <div>
   <div ng-view></div>
 </div>
 ```
 
-```
+```html
 <div class="panel panel1">
     <a href="/">Home</a>
 </div>
@@ -432,7 +434,7 @@ angular.module('foodApp').config(
 </div>
 ```
 
-```
+```js
 angular.module('foodApp').config(
 
   function config($locationProvider, $routeProvider) {
@@ -451,7 +453,7 @@ angular.module('foodApp').config(
 
 ###Filtering and Sorting (optional)
 
-```
+```html
 <ul>
     <li>
         <p>
