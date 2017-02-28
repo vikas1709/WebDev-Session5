@@ -481,14 +481,14 @@ angular.module('foodApp').config(
 ```css
 .highlight {
   transition: all 0.2s;
-  border-top: 2px solid #3958c6;
   position: absolute;
-  top:0;
-  background:transparent;
-  left:0;
+  top: 0;
+  background: rgba(255,255,255,0.2);
+  left: 0;
   z-index: 1;
   display: block;
-} 
+  pointer-events: none 
+  }
 ```
 
 ```js
