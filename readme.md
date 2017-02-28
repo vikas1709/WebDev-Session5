@@ -370,6 +370,7 @@ recipes.scss
     margin: 0 auto;
     ul {
         list-style: none;
+        padding: 0;
     }
     li {
         display: flex;
@@ -377,7 +378,9 @@ recipes.scss
         img {
             width: 30%;
             height:100%;
-            padding: 1rem;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            margin-right: 1rem;
         }
         h1 {
             font-family: lobster;
