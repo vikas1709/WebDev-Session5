@@ -1,4 +1,4 @@
-#Session 5 (placeholder only)
+#Session 5
 
 ##Components
 
@@ -10,13 +10,13 @@ Set up a simple html page bootstrapped with Angular (code.angularjs.org):
 
 <head>
     <title>AngularJS Module</title>
-    <script src="https://code.angularjs.org/1.6.1/angular.js"></script>
+    <script src="https://code.angularjs.org/1.6.2/angular.js"></script>
     <script src="test.js"></script>
 </head>
 
 <body>
     <div ng-app="myApp">
-        <div ng-controller="UserController">
+        <div ng-controller="GreetUserController">
             <p>Hello {{ user }}</p>
         </div>
     </div>
@@ -42,7 +42,9 @@ var myApp = angular.module('myApp', []);
 myApp.controller('GreetUserController', $scope  =>  $scope.user = 'John' )
 ```
 
-###Create a component:
+###Create a component
+
+Components are referenced directly in the html:
 
 ```
 <div ng-app="myApp">
@@ -50,7 +52,9 @@ myApp.controller('GreetUserController', $scope  =>  $scope.user = 'John' )
 </div>
 ```
 
-Use a component contains both the template and the controller:
+A component references an object that contains both the template and the controller. 
+
+Note the use of $ctrl for components as opposed to global $scope. Here the data is exclusive to a specific controller. Also, the html uses hyphens while the component uses camel case.
 
 ```
 var myApp = angular.module('myApp', []);
@@ -102,7 +106,7 @@ Use express routes for handling data and authentication. (Always include a singl
 
 Angular routes handle the view (templates) and the logic (controllers) for the views.
 
-`<script src="https://code.angularjs.org/1.6.1/angular-route.js"></script>`
+`<script src="https://code.angularjs.org/1.6.2/angular-route.js"></script>`
 
 ```
 var myApp = angular.module('myApp', ['ngRoute']);
@@ -132,13 +136,25 @@ myApp.controller('ByeUserController', function($scope){
 })
 ```
 
+Because we are not using components we are back to using $scope.
+
+ng-view
+
 ```
 <div ng-app="myApp">
     <div ng-view></div>
 </div>
 ```
 
+Note the url string now includes the hash and a bang ('!'). 
+
+Go to `http://localhost:3000/#!/bye`
+
 ###Add Components
+
+The routing specifies a template defined by a component.
+
+Hash prefixes and be set using $locationProvider (defaults to !).
 
 ```
 var myApp = angular.module('myApp', ['ngRoute']);
@@ -177,7 +193,7 @@ myApp.component('byeUser', {
 myApp.component('greetUser', {
     template: `
     <h4>Hello, {{ $ctrl.user }}!</h4>
-    <p><a href="/bye">Bye</a></p>
+    <p><a href="#!/bye">Bye</a></p>
     `,
     controller: function GreetUserController() {
         this.user = 'world';
@@ -225,7 +241,15 @@ Routing in a spa is best done using the hash structure (no page refresh).
 
 `<body ng-app="foodApp">`
 
+Create `foodapp.module.js`
+
 `var app = angular.module('foodApp', []);`
+
+and link it: `<script src="js/foodapp.module.js"></script>`
+
+Create recipes folder in js.
+
+Create `recipe-list.component.js` and link it.
 
 ```
 angular.module('foodApp').component('recipeList', {
@@ -242,6 +266,8 @@ angular.module('foodApp').component('recipeList', {
   <recipe-list></recipe-list>
 </div>
 ```
+
+Debug!
 
 Add a template and data to the controller:
 
@@ -295,17 +321,11 @@ angular.module('foodApp').component('recipeList', {
 });
 ```
 
-Break down the elements into separate js files.
+Note the break down of the elements into separate js files.
 
-js > recipes > recipes-template.html
+js > recipes > recipe-list.template.html
 
-`templateUrl: 'js/recipes/recipes-template.html',`
-
-js > recipes > recipes-list.component.js
-
-js > foodapp.module.js
-
-`angular.module('foodApp', []);`
+`templateUrl: 'js/recipes/recipe-list.template.html',`
 
 ###Format the recipes
 
@@ -326,8 +346,7 @@ js > foodapp.module.js
 styles.scss:
 
 ```
-@import 'imports/panels';
-@import 'imports/recipes'; 
+@import 'imports/recipe-list'; 
 ```
 
 recipes.scss
@@ -361,17 +380,13 @@ recipes.scss
 
 ###Routing
 
-`<script src="https://code.angularjs.org/1.6.1/angular-route.js"></script>`
+Wire up the main nav.
+
+`<script src="https://code.angularjs.org/1.6.2/angular-route.js"></script>`
 
 `<script src="js/foodapp.config.js"></script>`
 
 `<base href="/">`
-
-```
-<div class="panel panel1 active">
-  <a href="/">Home</a>
-</div>
-```
 
 `angular.module('foodApp', ['ngRoute']);`
 
@@ -398,92 +413,63 @@ angular.module('foodApp').config(
 </div>
 ```
 
+```
+<div class="panel panel1">
+    <a href="/">Home</a>
+</div>
+<div class="panel panel2 active">
+    <a href="/recipes">Recipes</a>
+</div>
+```
 
+```
+angular.module('foodApp').config(
 
+  function config($locationProvider, $routeProvider) {
+    $routeProvider.
+    when('/', {
+      template: 'test'
+    }).
+    when('/recipes', {
+      template: '<recipe-list></recipe-list>'
+    }).
+    otherwise('/404');
 
+    $locationProvider.html5Mode(true);
+  });
+```
 
 
 
 ###Notes
 
-```
-angular.module('foodApp').directive('navBar', function(){
-  return {
-    scope: true,
-    templateUrl: 'includes/nav.html'
-  };
-})
-```
-
 <nav ng-include=" 'includes/nav.html' "></nav>
-
-```
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html')
-})
-
-app.get('/recipes', (req, res) => {
-    res.sendFile(__dirname + '/public/recipes.html')
-})
-```
 
 
 ```
 <!DOCTYPE html>
-<html lang="en" ng-app="recipeApp">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Recipes</title>
-  <script src="https://code.angularjs.org/1.6.1/angular.js"></script>
+  <script src="https://code.angularjs.org/1.6.2/angular.min.js"></script>
+  <script src="https://code.angularjs.org/1.6.2/angular-route.js"></script>
+  <script src="js/foodapp.module.js"></script>
+  <script src="js/foodapp.config.js"></script>
+  <script src="js/recipes/recipe-list.component.js"></script>
+
   <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
-  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="css/styles.css">
+
+  <base href="/">
 </head>
-<body class="home">
-
+<body ng-app="foodApp">
   <nav ng-include=" 'includes/nav.html' "></nav>
-
-  <h1>Home</h1>
-
-  <script src="/js/scripts.js"></script>
-
+  <div ng-view></div>
+  <script src="js/scripts.js"></script>
 </body>
 </html>
 ```
-
-
-
-
-
-###Directive
-
-`<nav-bar></nav-bar>`
-
-```
-<nav>
-  <div class="panels">
-    <div class="panel panel1">
-      <a href="/">Home</a>
-    </div>
-    <div class="panel panel2">
-      <a href="recipes">Recipes</a>
-    </div>
-    <div class="panel panel3">
-      <a href="reviews">Reviews</a>
-    </div>
-    <div class="panel panel4">
-      <a href="delivery">Delivery</a>
-    </div>
-    <div class="panel panel5">
-      <a href="about">About</a>
-    </div>
-  </div>
-</nav>
-```
-
-
-
-
-
 
 
 
