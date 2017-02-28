@@ -2,7 +2,7 @@
 
 ##Components
 
-Set up a simple html page bootstrapped with Angular:
+Set up a simple html page bootstrapped with Angular (code.angularjs.org):
 
 ```
 <!DOCTYPE html>
@@ -17,11 +17,10 @@ Set up a simple html page bootstrapped with Angular:
 <body>
     <div ng-app="myApp">
         <div ng-controller="UserController">
-            <p>Hello {{ user }}
+            <p>Hello {{ user }}</p>
         </div>
     </div>
 </body>
-
 </html>
 ```
 
@@ -30,28 +29,34 @@ test.js:
 ```
 angular.module('myApp', []);
 
-angular.module('myApp').controller('UserController', function( $scope ){
+angular.module('myApp').controller('GreetUserController', function( $scope ){
     $scope.user = 'John'
 })
+```
+
+refactored:
+
+```
+var myApp = angular.module('myApp', []);
+
+myApp.controller('GreetUserController', $scope  =>  $scope.user = 'John' )
 ```
 
 ###Create a component:
 
 ```
-<body>
-    <div ng-app="myApp">
-        <greet-user></greet-user>
-    </div>
-</body>
+<div ng-app="myApp">
+  <greet-user></greet-user>
+</div>
 ```
 
-Use a component which contains both the template and the controller:
+Use a component contains both the template and the controller:
 
 ```
-angular.module('myApp', []);
+var myApp = angular.module('myApp', []);
 
-angular.module('myApp').component('greetUser', {
-    template: 'Hello, {{$ctrl.user}}!',
+myApp.component('greetUser', {
+    template: 'Hello, {{ $ctrl.user }}!',
     controller: function GreetUserController() {
         this.user = 'world';
     }
@@ -63,15 +68,15 @@ angular.module('myApp').component('greetUser', {
 Add a second component: 
 
 ```
-angular.module('myApp').component('greetUser', {
-    template: 'Hello, {{$ctrl.user}}!',
+myApp.component('greetUser', {
+    template: 'Hello, {{ $ctrl.user }}!',
     controller: function GreetUserController() {
         this.user = 'world';
     }
 });
 
 
-angular.module('myApp').component('byeUser', {
+myApp.component('byeUser', {
     template: 'Bye, {{$ctrl.user}}!',
     controller: function ByeUserController() {
         this.user = 'cruel world';
@@ -88,18 +93,23 @@ angular.module('myApp').component('byeUser', {
 </body>
 ```
 
+
 ###Add routing
 
-If we want to swap out components we use Angular for routing in a SPA, not express routing. 
+If we want to swap out components we use Angular for routing a SPA, not express routing. 
 
-Use express routes for handling data and authentication. Always include a single route for index.html. Angular routes handle the view (templates) and the logic (controllers) for the views.
+Use express routes for handling data and authentication. (Always include a single route for index.html.) 
+
+Angular routes handle the view (templates) and the logic (controllers) for the views.
 
 `<script src="https://code.angularjs.org/1.6.1/angular-route.js"></script>`
 
 ```
-angular.module('myApp', ['ngRoute']);
+var myApp = angular.module('myApp', ['ngRoute']);
+```
 
-angular.module('myApp').config(
+```
+myApp.config(
     function config($routeProvider) {
         $routeProvider.
         when('/', {
@@ -113,31 +123,27 @@ angular.module('myApp').config(
         otherwise('/404');
     });
 
-angular.module('myApp').controller('GreetUserController', function($scope){
+myApp.controller('GreetUserController', function($scope){
     $scope.user = 'world';
 })
 
-angular.module('myApp').controller('ByeUserController', function($scope){
+myApp.controller('ByeUserController', function($scope){
     $scope.user = 'cruel world';
 })
 ```
 
 ```
-<body>
-    <div ng-app="myApp">
-        <div ng-view></div>
-    </div>
-</body>
+<div ng-app="myApp">
+    <div ng-view></div>
+</div>
 ```
 
 ###Add Components
 
 ```
-angular.module('myApp', [
-    'ngRoute'
-    ]);
+var myApp = angular.module('myApp', ['ngRoute']);
 
-angular.module('myApp').config(
+myApp.config(
     function config($locationProvider, $routeProvider) {
         $locationProvider.hashPrefix('!');
         $routeProvider.
@@ -150,20 +156,41 @@ angular.module('myApp').config(
         otherwise('/404');
     });
 
-angular.module('myApp').component('greetUser', {
+myApp.component('greetUser', {
     template: 'Hello, {{$ctrl.user}}!',
     controller: function GreetUserController() {
         this.user = 'world';
     }
 });
 
-angular.module('myApp').component('byeUser', {
+myApp.component('byeUser', {
     template: 'Bye, {{$ctrl.user}}!',
     controller: function ByeUserController() {
         this.user = 'cruel world';
     }
 });
 ```
+
+###Linking
+
+```
+myApp.component('greetUser', {
+    template: `
+    <h4>Hello, {{ $ctrl.user }}!</h4>
+    <p><a href="/bye">Bye</a></p>
+    `,
+    controller: function GreetUserController() {
+        this.user = 'world';
+    }
+});
+```
+In the config:
+
+`$locationProvider.html5Mode(true);`
+
+In index.html:
+
+`<base href="/">`
 
 
 ##Recipe Site
