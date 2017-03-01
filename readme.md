@@ -2,7 +2,7 @@
 
 Note: the refresh issue experienced in class was due to a restrictive route in app.js.
 
-Comment out the exisiting path and replace it with:
+Comment out the existing path and replace it with:
 
 ```
 // app.get('/', (req, res) => {
