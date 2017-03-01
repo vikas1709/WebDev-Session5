@@ -2,6 +2,20 @@
 
 ##Homework
 
+Note: the refresh issue experienced in class was due to a restrictive route in app.js.
+
+Comment out the exisitng path and replace it with:
+
+```
+// app.get('/', (req, res) => {
+// 	res.sendFile(__dirname + '/index.html')
+// })
+
+app.get('*', (req, res) => {
+	res.sendFile(__dirname + '/public/index.html')
+})
+```
+
 Review the creation of components below. 
 
 1. Add an Angular route for the reviews section of the page.
