@@ -1,7 +1,5 @@
 #Session 5
 
-##Homework
-
 Note: the refresh issue experienced in class was due to a restrictive route in app.js.
 
 Comment out the exisiting path and replace it with:
@@ -15,6 +13,10 @@ app.get('*', (req, res) => {
 	res.sendFile(__dirname + '/public/index.html')
 })
 ```
+
+This has been corrected in the 'done' branch of this repo.
+
+##Homework
 
 Review the creation of components below. 
 
