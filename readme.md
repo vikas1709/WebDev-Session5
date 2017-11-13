@@ -160,11 +160,11 @@ run:
 
 `npm install` and `DEBUG=myapp:* npm start` (see [generator page](http://expressjs.com/en/starter/generator.html) for Windows alternative)
 
-Inspect the new directory.
+Inspect the new directory. NOte how the functionality is broken up into multiple files.
 
 Test it at `http://localhost:3000/` using:
 
-Routes:
+in Routes > index.js:
 
 ```js
 res.render('index', { title: 'Express', animal: req.query.animal });
@@ -224,7 +224,7 @@ We'll be using babel with webpack:
 
 `https://babeljs.io/docs/setup/#installation`
 
-create webpack.config.js
+create webpack.config.js:
 
 ```js
 const webpack = require('webpack')
@@ -238,7 +238,28 @@ module.exports = {
 }
 ```
 
-Create empty `myapp.js`
+Create `myapp.js`
+
+```js
+const getMessage = () => "Hello World";
+document.getElementById('output').innerHTML = getMessage();
+```
+
+Add webpack and a boom to our scripts:
+
+```js
+  "scripts": {
+    "start": "nodemon ./bin/www",
+    "build": "webpack --progress --watch",
+    "boom!": "concurrently \"npm run start\" \"npm run build\" "
+  },
+```
+
+`npm run boom!`
+
+Note bundle.js and map.
+
+Add Babel to Webpack:
 
 ```js
 const webpack = require('webpack')
@@ -262,19 +283,9 @@ module.exports = {
 }
 ```
 
-Add webpack and a boom to our scripts:
+and retart the server again.
 
-```js
-  "scripts": {
-    "start": "nodemon ./bin/www",
-    "build": "webpack --progress --watch",
-    "boom!": "concurrently \"npm run start\" \"npm run build\" "
-  },
-```
-
-`npm run boom!`
-
-Note bundle.js and map.
+Note bundle.js
 
 Add link to layout.jade (be sure to use spaces or tabs:
 
@@ -289,6 +300,8 @@ html
     script(src='/javascripts/bundle.js')
 ```
 
+Refresh the page to compile jade.
+
 Add an #output div:
 
 ```
@@ -302,16 +315,16 @@ block content
   #output
 ```
 
-Create myapp.js
-
-Restart the server using the `boom!` command and add to `myapp.js`:
+Refresh the page to see the message:
 
 ```js
 const getMessage = () => "Hello World";
 document.getElementById('output').innerHTML = getMessage();
 ```
 
-Test with lodash in myapp.
+Test with [lodash](https://lodash.com) in myapp.
+
+`$ npm install lodash --save-dev`
 
 ```js
 import { uniq } from 'lodash';
@@ -354,7 +367,7 @@ module.exports = {
 }
 ```
 
-and restart the processes with boom!
+Restart the processes with boom! and inspect the bundle.
 
 ## API Key
 
@@ -385,7 +398,7 @@ const apiKey = 'abcdef';
 export default apiKey;
 ```
 
-Refresh the browser. Note new variable.
+Refresh the browser. Note the new variable.
 
 Because we exported is as default we can rename on import.
 
@@ -456,7 +469,7 @@ var routes = require('./routes/index');
 
 ## Angular as a Templating Engine
 
-Let's look at using an older (but still quite common and actively maintained) version of Angular as our page templating language.
+Let's return to our look at using an older (but still quite common and actively maintained) version of Angular as our page templating language.
 
 Remove views and jade in app.js
 
@@ -495,7 +508,7 @@ Link to bundle.js
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
-	<script src="javascripts/bundle.js"></script>
+	<script src="/javascripts/bundle.js"></script>
 </head>
 <body>
 	<p>It works!</p>
@@ -503,7 +516,7 @@ Link to bundle.js
 </html>
 ```
 
-Install angular:
+Stop running the app and npm install angular:
 
 `npm install angular@1.6.2 --save`
 
@@ -511,10 +524,6 @@ Import it into myapp.js:
 
 ```js
 import angular from 'angular';
-import { uniq } from 'lodash';
-
-const ages = [1, 1, 4, 52, 12, 4]
-console.log(uniq(ages)); 
 ```
 
 Remove uglify processing from webpack.
@@ -567,7 +576,7 @@ Angular uses this concept to extend html with [directives](https://www.w3schools
 ```
 
 
-### Angular Directives
+### Review: Angular Directives
 
 Simple Angular directives:
 
@@ -585,18 +594,19 @@ Simple Angular directives:
 
 This is a demonstration of [data binding](https://docs.angularjs.org/guide/databinding) and [filtering](https://docs.angularjs.org/api/ng/filter) to uppercase.
 
-Alternates 1 - using an object, e.g.:
+Alternate 1 - using an object, e.g.:
 
 `greeting = { greeter: 'Daniel' , message: 'Hello World' }`
 
 ```html
-	<div class="site-wrap"  ng-init="greeting = { greeter: 'Daniel' , message: 'Hello World' }"">
-		<input type="text" ng-model="greeting.greeter" size="30"/>
-<input type="text" ng-model="greeting.message" size="30"/>
-		<p>{{greeting.greeter }} says "{{ greeting.message }}</p>
-	</div>```
+  <div class="site-wrap"  ng-init="greeting = { greeter: 'Daniel' , message: 'Hello World' }"">
+    <input type="text" ng-model="greeting.greeter" size="30"/>
+    <input type="text" ng-model="greeting.message" size="30"/>
+    <p>{{greeting.greeter }} says "{{ greeting.message }}</p>
+  </div>
+```
 
-Alternates 2 - using ng-repeat with an array
+Alternate 2 - using ng-repeat with an array
 
 ```html
 	<div class="site-wrap" ng-init="portfolios = ['Call of Booty', 'The Sack of the Innocents', 'Pipe and First Mate']" >
@@ -689,11 +699,18 @@ app.controller('myCtrl', function($scope) {
 });
 ```
 
-## Components
+Refactored:
 
-Custom tags that can move templates into and out of html.
+```js
+var app = angular.module('myApp', []);
+app.controller('myCtrl', ($scope) => $scope.name = "John Doe");
+```
 
-myapp.js
+## Angular Components
+
+'Custom tags' that can move templates in and out of html.
+
+myapp.js:
 
 ```js
 import angular from 'angular';
@@ -720,30 +737,54 @@ angular.module('myApp').component('greetUser', {
 </body>
 ```
 
-## PROCESS
+or we can use template strings and store the module in a variable:
 
-Place a section of the page under the influence of an Angular controller:
+```js
+import angular from 'angular';
+
+var app = angular.module('myApp', []);
+
+app.component('greetUser', {
+    template: `Hello, {{$ctrl.user}}!`,
+    controller: function GreetUserController() {
+        this.user = 'world';
+    }
+});
+```
+
+By creating multiple components we will switch out the content depending on the route chosen.
+
+```js
+app.component('byeUser', {
+    template: `Bye, {{$ctrl.user}}!`,
+    controller: function GreetUserController() {
+        this.user = 'cruel world';
+    }
+});
+```
 
 ```html
 <!DOCTYPE html>
-<html lang="en" data-ng-app="myApp">
+<html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>Document</title>
-	<script src="javascripts/bundle.js"></script>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script src="javascripts/bundle.js"></script>
 </head>
 <body>
-	<nav data-ng-controller="NavController">
-		
-	</nav>
+  <div ng-app="myApp">
+    <bye-user></bye-user>
+  </div>
 </body>
 </html>
 ```
 
-navitems.js:
+## PROCESS
+
+Create navitems.js in src:
 
 ```
-const navItems = [
+const navitems = [
 {
   label: 'Watchlist',
   link: 'watchlist',
@@ -844,7 +885,25 @@ import navitems from './src/navitems';
 console.log(navitems);
 ```
 
-Declare app to be an instance of an Angular module:
+Place a section of the page under the influence of a controller:
+
+```html
+<!DOCTYPE html>
+<html lang="en" data-ng-app="myApp">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script src="javascripts/bundle.js"></script>
+</head>
+<body>
+  <nav data-ng-controller="NavController">
+    
+  </nav>
+</body>
+</html>
+```
+
+Declare app to be an instance of an Angular module (in myapp.js):
 
 `var app = angular.module('myApp', []);`
 
@@ -895,7 +954,7 @@ Build out the content:
 	</div>
 ```
 
-```
+```js
 app.controller("ContentController", function( $scope ) {
   $scope.navitems = navitems
   })
@@ -940,6 +999,9 @@ We can then use:
 ## Notes
 
 
-`npm install angular-route@1.6.2 --save-dev`
+`npm install angular-route@1.6.2 --save`
 
 `import ngRoute from 'angular-route';`
+
+`var app = angular.module('myApp', [ngRoute, ngSanitize]);`
+
