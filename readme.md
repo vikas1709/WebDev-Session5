@@ -1,22 +1,6 @@
-#Session 5
+# Session 5
 
-Note: the refresh issue experienced in class was due to a restrictive route in app.js.
-
-Comment out the existing path and replace it with:
-
-```
-// app.get('/', (req, res) => {
-// 	res.sendFile(__dirname + '/index.html')
-// })
-
-app.get('*', (req, res) => {
-	res.sendFile(__dirname + '/public/index.html')
-})
-```
-
-This has been corrected in the 'done' branch of this repo.
-
-##Homework
+<!-- ##Homework
 
 Review the creation of components below. 
 
@@ -25,9 +9,9 @@ Review the creation of components below.
 1. template that displays 4 or 5 one sentence summary reviews (restaurant images are provided in the img directory if you would like to use them)
 1. Bonus - make a nice 404 page for the other items on the main nav
 
-Good luck.
+Good luck. -->
 
-##Components
+## Components
 
 Set up a simple html page bootstrapped with Angular (code.angularjs.org):
 
@@ -69,7 +53,7 @@ var myApp = angular.module('myApp', []);
 myApp.controller('GreetUserController', $scope  =>  $scope.user = 'John' )
 ```
 
-###Create a component
+### Create a component
 
 (Comment out the controller.) Components are referenced directly in the html via custom tags:
 
@@ -96,7 +80,7 @@ myApp.component('greetUser', {
 
 Test in browser.
 
-###Create multiple components:
+### Create multiple components:
 
 Add a second component: 
 
@@ -127,7 +111,7 @@ myApp.component('byeUser', {
 ```
 
 
-###Add routing
+### Add routing
 
 (Comment out the previous components.) If we want to swap out components we use Angular for routing a SPA, not express routing. 
 
@@ -189,7 +173,7 @@ Note the url string now includes the hash and a bang ('!').
 
 Go to `http://localhost:3000/#!/bye`
 
-###Add Components
+### Add Components
 
 (Comment out the previous controllers. Uncomment the old components.) The routing specifies a template defined by a component.
 
@@ -226,7 +210,7 @@ myApp.component('byeUser', {
 });
 ```
 
-###Linking
+### Linking
 
 ```js
 myApp.component('greetUser', {
@@ -254,7 +238,7 @@ In index.html:
 Note the cleaner urls.
 
 
-##Recipe Site
+## Recipe Site
 
 Examine package.json, app.js, index.html and scripts.js
 
@@ -355,7 +339,7 @@ js > recipes > recipe-list.template.html
 
 `templateUrl: 'js/recipes/recipe-list.template.html',`
 
-###Format the recipes
+### Format the recipes
 
 ```html
 <div class="wrap">
@@ -409,7 +393,7 @@ recipes.scss
 }
 ```
 
-###Routing
+### Routing
 
 Wire up the main nav. In the html:
 
@@ -474,7 +458,7 @@ angular.module('foodApp').config(
   });
 ```
 
-###Filtering and Sorting (optional)
+### Filtering and Sorting (optional)
 
 ```html
 <ul>
@@ -498,7 +482,7 @@ angular.module('foodApp').config(
 `this.orderProp = 'date';`
 
 
-###Notes
+### Notes
 
 
 ```css
