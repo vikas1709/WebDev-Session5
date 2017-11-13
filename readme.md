@@ -158,7 +158,9 @@ Generate a site:
 
 run:
 
-`npm install` and `DEBUG=myapp:* npm start` (see generator page for Windows alternative)
+`npm install` and `DEBUG=myapp:* npm start` (see [generator page](http://expressjs.com/en/starter/generator.html) for Windows alternative)
+
+Inspect the new directory.
 
 Test it at `http://localhost:3000/` using:
 
@@ -168,7 +170,7 @@ Routes:
 res.render('index', { title: 'Express', animal: req.query.animal });
 ```
 
-Pug: variables into text:
+Pug: variables into text (in views):
 
 ```
 `p.hello My animal's name is #{animal}`
@@ -180,7 +182,7 @@ http://localhost:3000/?animal=dog
 
 Restart the server.
 
-Set node command to nodemon:
+Set node command to nodemon in package.json (be sure you have nodemon installed first):
 
 ```js
   "scripts": {
