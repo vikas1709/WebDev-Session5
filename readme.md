@@ -22,7 +22,7 @@ Angular uses this concept to extend html with [directives](https://www.w3schools
 
 Simple Angular directives:
 
-1. ng-app − This directive starts an AngularJS Application. We use it to create [Modules](https://docs.angularjs.org/guide/module)
+1. ng-app − This directive starts an AngularJS Application.
 2. ng-init − This directive initializes application data. (We won't use it except for the simple examples below.)
 3. ng-model − This directive defines the model that is variable to be used in AngularJS.
 4. ng-repeat − This directive repeats html elements for each item in a collection.
@@ -145,20 +145,22 @@ Create `test.html`:
 ```
 
 
-## Angular on Express
+## Angular on Express with Babel and Webpack
 
 
-npm install [express generator](http://expressjs.com/en/starter/generator.html)
+Install [express generator](http://expressjs.com/en/starter/generator.html):
+
+`$ npm install express-generator -g`, you may have to run as administrator on a PC or run `$ sudo npm install express-generator -g` on a Mac.
 
 Create a new empty directory and `cd` into it.
 
 Generate a site:
 
-`express --view=pug myapp --css sass`
+`$ express --view=pug myapp --css sass`
 
 run:
 
-`npm install` and `DEBUG=myapp:* npm start` (see [generator page](http://expressjs.com/en/starter/generator.html) for Windows alternative)
+`npm install` and `DEBUG=myapp:* npm start` (see the [generator page](http://expressjs.com/en/starter/generator.html) for Windows alternative)
 
 Inspect the new directory. NOte how the functionality is broken up into multiple files.
 
