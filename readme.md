@@ -1,599 +1,943 @@
 # Session 5
 
-<!-- ##Homework
+## Angular as a Templating Engine
 
-Review the creation of components below. 
+Let's look at Angular as our page templating language.
 
-1. Add an Angular route for the reviews section of the page.
-1. Create a component for the review page along with a 
-1. template that displays 4 or 5 one sentence summary reviews (restaurant images are provided in the img directory if you would like to use them)
-1. Bonus - make a nice 404 page for the other items on the main nav
+In the terminal, cd into the angular folder and set it up with npm install and run `nodemon app.js`
 
-Good luck. -->
+Add a link to Angular in the head of index.html:
+
+`<script src="https://code.angularjs.org/1.5.8/angular.js"></script>`
+
+HTML5 introduced the `data-` [attribute](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes).
+
+Angular uses this concept to extend html with [directives](https://www.w3schools.com/angular/angular_directives.asp) such as data-ng-app, data-ng-controller, data-ng-repeat
+
+`<html lang="en"  data-ng-app>`
+
+
+
+### Angular Directives
+
+Simple Angular directives:
+
+1. ng-app − This directive starts an AngularJS Application. We use it to create [Modules](https://docs.angularjs.org/guide/module)
+2. ng-init − This directive initializes application data. (We won't use it except for the simple examples below.)
+3. ng-model − This directive defines the model that is variable to be used in AngularJS.
+4. ng-repeat − This directive repeats html elements for each item in a collection.
+
+```html
+<div class="site-wrap"  ng-init="messageText = 'Hello World!'">
+
+<input ng-model="messageText" size="30"/>
+<p>Everybody shout "{{ messageText | uppercase }}"</p>
+```
+
+This is a demonstration of [data binding](https://docs.angularjs.org/guide/databinding) and [filtering](https://docs.angularjs.org/api/ng/filter) to uppercase.
+
+Alernates 1 - using an object
+
+`ng-init="greeting = { greeter: 'Daniel' , message: 'Hello World' }"`
+
+```html
+<input type="text" ng-model="greeting.greeter" size="30"/>
+<input type="text" ng-model="greeting.message" size="30"/>
+{{greeting.greeter }} says "{{ greeting.message }}"
+```
+
+Alternates 2 - using ng-repeat with an array
+
+```html
+<div class="site-wrap" ng-init="portfolios = ['Call of Booty', 'The Sack of the Innocents', 'Pipe and First Mate']" >
+
+<ul>
+  <li ng-repeat="portfolio in portfolios">
+    {{ portfolio }}
+  </li>
+</ul>
+```
+
+Alernate 3 - [filtering](https://docs.angularjs.org/api/ng/filter) and ordering on an array of objects
+
+```html
+<div class="site-wrap" ng-init="portfolios = [
+{ name: 'Call of Booty', date: '2013-09-01' },
+{ name: 'The Sack of the Innocents', date: '2014-04-15' },
+{ name: 'Pipe and First Mate', date: '2012-10-01' } ]">
+
+<p>Filter list: <input ng-model="searchFor" size="30"/></p>
+
+<ul>
+  <li ng-repeat="portfolio in portfolios | filter:searchFor | orderBy:'date' ">
+  {{ portfolio.name  }}</li>
+</ul>
+```
+
+ngClass:
+
+```html
+<ul>
+  <li ng-repeat="portfolio in portfolios |
+  filter:searchFor |
+  orderBy:'date'"
+  ng-class="{ even: $even, odd: $odd }">
+  {{ portfolio.name  }}</li>
+</ul>
+```
+
+with:
+
+```html
+<style>
+  .even { color: red; }
+  .odd { color: blue; }
+</style>
+```
+
+keys and values of the array:
+
+```html
+<ul>
+  <li ng-repeat="(key, value) in portfolios">
+      <strong>{{key}}</strong> - {{value}}
+  </li>
+</ul>
+```
 
 ## Components
 
-Set up a simple html page bootstrapped with Angular (code.angularjs.org):
+Create: `test.js`:
+
+```js
+angular.module('myApp', []);
+
+angular.module('myApp').component('greetUser', {
+    template: 'Hello, {{$ctrl.user}}!',
+    controller: function GreetUserController() {
+        this.user = 'world';
+    }
+});
+```
+
+Create `test.html`:
 
 ```html
 <!DOCTYPE html>
 <html>
 
 <head>
-    <title>AngularJS Module</title>
-    <script src="https://code.angularjs.org/1.6.2/angular.js"></script>
-    <script src="test.js"></script>
+  <meta charset="utf-8" />
+  <title>AngularJS Module</title>
+  <script src="https://code.angularjs.org/1.5.8/angular.js"></script>
+  <script src="test.js"></script>
 </head>
 
 <body>
-    <div ng-app="myApp">
-        <div ng-controller="GreetUserController">
-            <p>Hello {{ user }}</p>
-        </div>
-    </div>
+
+  <div ng-app="myApp">
+    <greet-user></greet-user>
+  </div>
+
+</body>
+
+</html>
+```
+
+
+## Angular on Express
+
+
+npm install [express generator](http://expressjs.com/en/starter/generator.html)
+
+Create a new empty directory and `cd` into it.
+
+Generate a site:
+
+`express --view=pug myapp --css sass`
+
+run:
+
+`npm install` and `DEBUG=myapp:* npm start` (see generator page for Windows alternative)
+
+Test it at `http://localhost:3000/` using:
+
+Routes:
+
+```js
+res.render('index', { title: 'Express', animal: req.query.animal });
+```
+
+Pug: variables into text:
+
+```
+`p.hello My animal's name is #{animal}`
+```
+
+```
+http://localhost:3000/?animal=dog
+```
+
+Restart the server.
+
+Set node command to nodemon:
+
+```js
+  "scripts": {
+    "start": "nodemon ./bin/www"
+  },
+```
+
+Pug variables into attributes:
+
+```
+img.animal(src="animal.jpg" alt="#{animal}")
+```
+
+or use js:
+
+```
+img.animal(src="animal.jpg" alt=`${animal}`)
+```
+
+```
+- const upAnimal = animal.toUpperCase()
+p My animal is #{upAnimal}
+```
+
+## Babel
+
+Additional installs for webpack and babel.
+
+`$ npm i --save-dev babel-core babel-loader babel-preset-env webpack concurrently`
+
+Demo on babeljs.io:
+
+```js
+const getMessage = () => "Hello World";
+document.getElementById('output').innerHTML = getMessage();
+```
+
+We'll be using babel with webpack:
+
+`https://babeljs.io/docs/setup/#installation`
+
+create webpack.config.js
+
+```js
+const webpack = require('webpack')
+
+module.exports = {
+    devtool: 'source-map',
+    entry: './myapp.js',
+    output: {
+        filename: './public/javascripts/bundle.js'
+    }
+}
+```
+
+Create empty `myapp.js`
+
+```js
+const webpack = require('webpack')
+
+module.exports = {
+	devtool: 'source-map',
+	entry: './myapp.js',
+	output: {
+		filename: './public/javascripts/bundle.js'
+	},
+	module: {
+		loaders: [{
+			test: /\.js$/,
+			exclude: /node_modules/,
+			loader: 'babel-loader',
+			query: {
+				presets: ['env']
+			}
+		}]
+	}
+}
+```
+
+Add webpack and a boom to our scripts:
+
+```js
+  "scripts": {
+    "start": "nodemon ./bin/www",
+    "build": "webpack --progress --watch",
+    "boom!": "concurrently \"npm run start\" \"npm run build\" "
+  },
+```
+
+`npm run boom!`
+
+Note bundle.js and map.
+
+Add link to layout.jade (be sure to use spaces or tabs:
+
+```
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    block content
+    script(src='/javascripts/bundle.js')
+```
+
+Add an #output div:
+
+```
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+  - const upAnimal = animal.toUpperCase()
+  p My animal is #{upAnimal}
+  #output
+```
+
+Create myapp.js
+
+Restart the server using the `boom!` command and add to `myapp.js`:
+
+```js
+const getMessage = () => "Hello World";
+document.getElementById('output').innerHTML = getMessage();
+```
+
+Test with lodash in myapp.
+
+```js
+import { uniq } from 'lodash';
+
+const person = [ 1,1,3,45,8,67,8 ]
+
+console.log(uniq(person))
+```
+
+Note: your bundle just got pretty large.
+
+Add uglify processing to webpack
+
+```js
+const webpack = require('webpack')
+
+module.exports = {
+	devtool: 'source-map',
+	entry: './myapp.js',
+	output: {
+		filename: './public/javascripts/bundle.js'
+	},
+	module: {
+		loaders: [{
+			test: /\.js$/,
+			exclude: /node_modules/,
+			loader: 'babel-loader',
+			query: {
+				presets: ['env']
+			}
+		}]
+	},
+	plugins: [
+	new webpack.optimize.UglifyJsPlugin({
+		compress: { warnings: false },
+		output: { comments: false },
+		sourceMap: true
+	})
+	]
+}
+```
+
+and restart the processes with boom!
+
+## API Key
+
+Create `src` directory with `config.js` inside.
+
+Edit config.js:
+
+```js
+const apiKey = 'abcdef'
+```
+
+Import it into myapp.js (note: paths are not necessary for node modules):
+
+```js
+import apiKey from './src/config';
+console.log(apiKey);
+```
+
+Refresh the browser. Note empty object.
+
+Export the data - using *default* and *named* exports.
+
+In config.js:
+
+```js
+const apiKey = 'abcdef';
+
+export default apiKey;
+```
+
+Refresh the browser. Note new variable.
+
+Because we exported is as default we can rename on import.
+
+```js
+import foo from './src/config';
+console.log(foo);
+```
+
+Modules can only have one default export but *can* have multiple named exports.
+
+A named export:
+
+`export const apiKey = 'abcdef';`
+
+requires an import that looks like:
+
+```js
+import {apiKey} from './src/config';
+console.log(apiKey);
+```
+
+Multiple named exports:
+
+```js
+export const apiKey = 'abcdef';
+export const url = 'https://mlab.com';
+```
+
+```js
+import {apiKey, url} from './src/config';
+console.log(apiKey, url);
+```
+
+Multiple named exports encourage code encapsulation and reuse across multiple projects.
+
+Functions can be internal to a module or exported:
+
+```js
+export const apiKey = 'abcdef';
+export const url = 'https://mlab.com';
+
+export function sayHi(name){
+	console.log(`Say hello ${name}`)
+}
+```
+
+```js
+import {apiKey, url, sayHi} from './src/config';
+sayHi('daniel');
+```
+
+See [the documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export) on MDN for options including `import as`, `export as` and exporting multiples.
+
+Note the resemblance (and difference) between module importing above and Node.
+
+routes > index.js
+
+```js
+module.exports = router;
+```
+
+app.js:
+
+```js
+var routes = require('./routes/index');
+```
+
+
+## Angular as a Templating Engine
+
+Let's look at using an older (but still quite common and actively maintained) version of Angular as our page templating language.
+
+Remove views and jade in app.js
+
+```js
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'jade');
+```
+
+Add to routes index.js:
+
+```js
+  // res.render('index', { title: 'Express', animal: req.query.animal });
+  res.sendFile(__dirname + '/public/index.html')
+```
+
+Create index.html page in public:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<p>It works!</p>
 </body>
 </html>
 ```
 
-test.js:
+Link to bundle.js
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="javascripts/bundle.js"></script>
+</head>
+<body>
+	<p>It works!</p>
+</body>
+</html>
+```
+
+Install angular:
+
+`npm install angular@1.6.2 --save`
+
+Import it into myapp.js:
 
 ```js
+import angular from 'angular';
+import { uniq } from 'lodash';
+
+const ages = [1, 1, 4, 52, 12, 4]
+console.log(uniq(ages)); 
+```
+
+Remove uglify processing from webpack.
+
+```js
+const webpack = require('webpack')
+
+module.exports = {
+	devtool: 'source-map',
+	entry: './myapp.js',
+	output: {
+		filename: './public/javascripts/bundle.js'
+	},
+	module: {
+		loaders: [{
+			test: /\.js$/,
+			exclude: /node_modules/,
+			loader: 'babel-loader',
+			query: {
+				presets: ['env']
+			}
+		}]
+	}
+}
+```
+
+HTML5 introduced the `data-` [attribute](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes).
+
+Angular uses this concept to extend html with [directives](https://www.w3schools.com/angular/angular_directives.asp) such as data-ng-app, data-ng-controller, data-ng-repeat
+
+`<html lang="en"  data-ng-app>`
+
+```html
+<!DOCTYPE html>
+<html lang="en" data-ng-app>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="/javascripts/bundle.js"></script>
+</head>
+
+<body>
+    <p>It works</p>
+</body>
+
+</html>
+```
+
+
+### Angular Directives
+
+Simple Angular directives:
+
+1. ng-app − this directive starts an AngularJS application in the code block where it is inserted. We will use it to create [Modules](https://docs.angularjs.org/guide/module)
+1. ng-init − this directive initializes application data. (We won't using it beyond the simple examples below)
+1. ng-model − this directive binds an input, select, or textarea to our data
+1. ng-repeat − this directive repeats html elements for each item in a collection
+
+```html
+	<div class="site-wrap"  ng-init="messageText = 'Hello World!'">
+		<input ng-model="messageText" size="30"/>
+		<p>Everybody shout "{{ messageText | uppercase }}"</p>
+	</div>
+```
+
+This is a demonstration of [data binding](https://docs.angularjs.org/guide/databinding) and [filtering](https://docs.angularjs.org/api/ng/filter) to uppercase.
+
+Alternates 1 - using an object, e.g.:
+
+`greeting = { greeter: 'Daniel' , message: 'Hello World' }`
+
+```html
+	<div class="site-wrap"  ng-init="greeting = { greeter: 'Daniel' , message: 'Hello World' }"">
+		<input type="text" ng-model="greeting.greeter" size="30"/>
+<input type="text" ng-model="greeting.message" size="30"/>
+		<p>{{greeting.greeter }} says "{{ greeting.message }}</p>
+	</div>```
+
+Alternates 2 - using ng-repeat with an array
+
+```html
+	<div class="site-wrap" ng-init="portfolios = ['Call of Booty', 'The Sack of the Innocents', 'Pipe and First Mate']" >
+		<ul>
+			<li ng-repeat="portfolio in portfolios">
+				{{ portfolio }}
+			</li>
+		</ul>
+	</div>
+```
+
+Alernate 3 - [filtering](https://docs.angularjs.org/api/ng/filter) and ordering on an array of objects
+
+```html
+<div class="site-wrap" ng-init="portfolios = [
+{ name: 'Call of Booty', date: '2013-09-01' },
+{ name: 'The Sack of the Innocents', date: '2014-04-15' },
+{ name: 'Pipe and First Mate', date: '2012-10-01' } ]">
+
+<p>Filter list: <input ng-model="searchFor" size="30"/></p>
+
+<ul>
+  <li ng-repeat="portfolio in portfolios | filter:searchFor | orderBy:'date' ">
+  {{ portfolio.name  }}</li>
+</ul>
+```
+
+ngClass:
+
+```html
+<ul>
+  <li ng-repeat="portfolio in portfolios |
+  filter:searchFor |
+  orderBy:'date'"
+  ng-class="{ even: $even, odd: $odd }">
+  {{ portfolio.name  }}</li>
+</ul>
+```
+
+with:
+
+```html
+<style>
+  .even { color: red; }
+  .odd { color: blue; }
+</style>
+```
+
+keys and values of the array:
+
+```html
+	<div class="site-wrap" ng-init="portfolios = [
+	{ name: 'Call of Booty', date: '2013-09-01' },
+	{ name: 'The Sack of the Innocents', date: '2014-04-15' },
+	{ name: 'Pipe and First Mate', date: '2012-10-01' } ]">
+
+	<ul>
+		<li ng-repeat="(key, value) in portfolios">
+			<strong>{{key}}</strong> - {{value}}
+		</li>
+	</ul>
+```
+
+## Named Apps
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="javascripts/bundle.js"></script>
+</head>
+<body>
+	<div class="site-wrap" data-ng-app=myApp >
+		<div data-ng-controller="myCtrl">
+			Name: <input data-ng-model="name">
+		</div>
+	</div>
+</body>
+</html>
+```
+
+In myapp.js:
+
+```js
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope) {
+    $scope.name = "John Doe";
+});
+```
+
+## Components
+
+Custom tags that can move templates into and out of html.
+
+myapp.js
+
+```js
+import angular from 'angular';
+
 angular.module('myApp', []);
 
-angular.module('myApp').controller('GreetUserController', function( $scope ){
-    $scope.user = 'John'
-})
-```
-
-refactored:
-
-```js
-var myApp = angular.module('myApp', []);
-
-myApp.controller('GreetUserController', $scope  =>  $scope.user = 'John' )
-```
-
-### Create a component
-
-(Comment out the controller.) Components are referenced directly in the html via custom tags:
-
-```html
-<div ng-app="myApp">
-  <greet-user></greet-user>
-</div>
-```
-
-A component references an object that contains both a template and a controller. 
-
-Note the use of $ctrl for components as opposed to global $scope. Here the data is exclusive to a specific controller. Also, the html uses hyphens while the component uses camel case.
-
-```js
-var myApp = angular.module('myApp', []);
-
-myApp.component('greetUser', {
-    template: 'Hello, {{ $ctrl.user }}!',
-    controller: function GreetUserController() {
-        this.user = 'world';
-    }
-});
-```
-
-Test in browser.
-
-### Create multiple components:
-
-Add a second component: 
-
-```js
-myApp.component('greetUser', {
-    template: 'Hello, {{ $ctrl.user }}!',
-    controller: function GreetUserController() {
-        this.user = 'world';
-    }
-});
-
-
-myApp.component('byeUser', {
-    template: 'Bye, {{$ctrl.user}}!',
-    controller: function ByeUserController() {
-        this.user = 'cruel world';
-    }
-});
-```
-
-```html
-<body>
-    <div ng-app="myApp">
-        <greet-user></greet-user>
-        <bye-user></bye-user>
-    </div>
-</body>
-```
-
-
-### Add routing
-
-(Comment out the previous components.) If we want to swap out components we use Angular for routing a SPA, not express routing. 
-
-Use express routes for handling data and authentication. (Always include a single route for index.html.) 
-
-e.g. something like this would be a bad idea:
-
-```js
-app.get('/recipes', (req, res) => {
-    res.sendFile(__dirname + '/public/recipes.html')
-})
-```
-
-Routing in a spa is best done using the hash structure (no page refresh).
-
-Angular routes handle the view (templates) and the logic (controllers) for the views.
-
-`<script src="https://code.angularjs.org/1.6.2/angular-route.js"></script>`
-
-```js
-var myApp = angular.module('myApp', ['ngRoute']);
-```
-
-```js
-myApp.config(
-    function config($routeProvider) {
-        $routeProvider.
-        when('/', {
-            template: 'Hello, {{user}}!',
-            controller: 'GreetUserController'
-        }).
-        when('/bye', {
-            template: 'Bye, {{user}}!',
-            controller: 'ByeUserController'
-        }).
-        otherwise('/404');
-    });
-
-myApp.controller('GreetUserController', function($scope){
-    $scope.user = 'world';
-})
-
-myApp.controller('ByeUserController', function($scope){
-    $scope.user = 'cruel world';
-})
-```
-
-Because we are not using components we are back to using $scope.
-
-ng-view
-
-```html
-<div ng-app="myApp">
-    <div ng-view></div>
-</div>
-```
-
-Note the url string now includes the hash and a bang ('!'). 
-
-Go to `http://localhost:3000/#!/bye`
-
-### Add Components
-
-(Comment out the previous controllers. Uncomment the old components.) The routing specifies a template defined by a component.
-
-Hash prefixes and be set using $locationProvider (defaults to !).
-
-```js
-var myApp = angular.module('myApp', ['ngRoute']);
-
-myApp.config(
-    function config($locationProvider, $routeProvider) {
-        $locationProvider.hashPrefix('!');
-        $routeProvider.
-        when('/', {
-            template: '<greet-user></greet-user>'
-        }).
-        when('/bye', {
-            template: '<bye-user></bye-user>'
-        }).
-        otherwise('/404');
-    });
-
-myApp.component('greetUser', {
+angular.module('myApp').component('greetUser', {
     template: 'Hello, {{$ctrl.user}}!',
     controller: function GreetUserController() {
         this.user = 'world';
     }
 });
-
-myApp.component('byeUser', {
-    template: 'Bye, {{$ctrl.user}}!',
-    controller: function ByeUserController() {
-        this.user = 'cruel world';
-    }
-});
 ```
 
-### Linking
-
-```js
-myApp.component('greetUser', {
-    template: `
-    <h4>Hello, {{ $ctrl.user }}!</h4>
-    <p><a href="#!/bye">Bye</a></p>
-    `,
-    controller: function GreetUserController() {
-        this.user = 'world';
-    }
-});
-```
-html5 mode is an alternative to hashbang mode. See [this discussion](http://stackoverflow.com/questions/16677528/location-switching-between-html5-and-hashbang-mode-link-rewriting#16678065) on stack overflow.
-
-In the config:
-
-Comment out `// $locationProvider.hashPrefix('!')`
-
-`$locationProvider.html5Mode(true);`
-
-In index.html:
-
-`<base href="/">`
-
-Note the cleaner urls.
-
-
-## Recipe Site
-
-Examine package.json, app.js, index.html and scripts.js
-
-`sudo npm install`
-
-`npm run boom!`
-
-Allow express to use public as a source for static files and our Angular work:
-
-`app.use(express.static('public'))`
-
-`<script src="https://code.angularjs.org/1.5.8/angular.js"></script>`
-
-`<body ng-app="foodApp">`
-
-Create `foodapp.module.js`
-
-`var app = angular.module('foodApp', []);`
-
-and link it: `<script src="js/foodapp.module.js"></script>`
-
-Create recipes folder in js.
-
-Create `recipe-list.component.js` and link it.
-
-```js
-angular.module('foodApp').component('recipeList', {
-    template: `<h1>test</h1>`,
-    controller: function RecipeListController() {
-
-    }
-});
-```
+`index.html`:
 
 ```html
-<div>
-  <recipe-list></recipe-list>
-</div>
-```
+<body>
 
-Debug!
-
-Add a template and data to the controller:
-
-```js
-angular.module('foodApp').component('recipeList', {
-  template:
-  `
-  <div>
-  <ul>
-      <li ng-repeat="recipe in $ctrl.recipes">
-          <img ng-src="img/home/{{ recipe.image }}">
-          <h1><a href="#0">{{ recipe.title }}</a></h1>
-          <p>{{ recipe.description }}</p>
-      </li>
-  </ul>
+  <div ng-app="myApp">
+    <greet-user></greet-user>
   </div>
-  `,
 
-  controller: function RecipeListController( ) {
-    this.recipes = [
-    {
-      name: 'recipe1309',
-      title: 'Lasagna',
-      date: '2013-09-01',
-      description: 'Lasagna noodles piled high and layered full of three kinds of cheese to go along with the perfect blend of meaty and zesty, tomato pasta sauce all loaded with herbs.',
-      image: 'lasagne.png'
-    },
-    {
-      name: 'recipe1404',
-      title: 'Pho-Chicken Noodle Soup',
-      date: '2014-04-15',
-      description: 'Pho (pronounced “fuh”) is the most popular food in Vietnam, often eaten for breakfast, lunch and dinner. It is made from a special broth that simmers for several hours infused with exotic spices and served over rice noodles with fresh herbs.',
-      image: 'pho.png'
-    },
-    {
-      name: 'recipe1210',
-      title: 'Guacamole',
-      date: '2012-10-01',
-      description: 'Guacamole is definitely a staple of Mexican cuisine. Even though Guacamole is pretty simple, it can be tough to get the perfect flavor – with this authentic Mexican guacamole recipe, though, you will be an expert in no time.',
-      image: 'guacamole.png'
-    },
-    {
-      name: 'recipe1810',
-      title: 'Hamburger',
-      date: '2012-10-20',
-      description: 'A Hamburger (or often called as burger) is a type of food in the form of a rounded bread sliced in half and its Center is filled with patty which is usually taken from the meat, then the vegetables be lettuce, tomatoes and onions.',
-      image: 'hamburger.png'
-    }
-    ];
-  }
-});
+</body>
 ```
 
-Break down the template into a separate file:
+## PROCESS
 
-js > recipes > recipe-list.template.html
-
-`templateUrl: 'js/recipes/recipe-list.template.html',`
-
-### Format the recipes
+Place a section of the page under the influence of an Angular controller:
 
 ```html
-<div class="wrap">
-    <ul>
-        <li ng-repeat="recipe in $ctrl.recipes">
-            <img ng-src="img/home/{{ recipe.image }}">
-            <div>
-            <h1><a href="#0">{{ recipe.title }}</a></h1>
-            <p>{{ recipe.description }}</p>
-            </div>
-        </li>
-    </ul>
-</div>
-```
-
-styles.scss:
-
-```
-@import 'imports/recipe-list'; 
-```
-
-recipes.scss
-
-```css
-.wrap {
-    background: #eee;
-    max-width: 940px;
-    margin: 0 auto;
-    ul {
-        list-style: none;
-        padding: 0;
-    }
-    li {
-        display: flex;
-        padding: 1rem;
-        img {
-            width: 30%;
-            height:100%;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            margin-right: 1rem;
-        }
-        h1 {
-            font-family: lobster;
-            a {
-                color: #666;
-                text-decoration: none;
-            }
-        }
-    }
-}
-```
-
-### Routing
-
-Wire up the main nav. In the html:
-
-`<script src="https://code.angularjs.org/1.6.2/angular-route.js"></script>`
-
-`<script src="js/foodapp.config.js"></script>`
-
-`<base href="/">`
-
-In the module:
-
-`angular.module('foodApp', ['ngRoute']);`
-
-foodapp.config.js:
-
-```js
-angular.module('foodApp').config(
-
-  function config($locationProvider, $routeProvider) {
-    $routeProvider.
-    when('/', {
-      template: 'test'
-    }).
-    when('/recipes', {
-      template: 'test2'
-    }).
-    otherwise('/404');
-
-    $locationProvider.html5Mode(true);
-  });
-  ```
-
-```html
-<div>
-  <div ng-view></div>
-</div>
-```
-
-```html
-<div class="panel panel1">
-    <a href="/">Home</a>
-</div>
-<div class="panel panel2 active">
-    <a href="/recipes">Recipes</a>
-</div>
-```
-
-```js
-angular.module('foodApp').config(
-
-  function config($locationProvider, $routeProvider) {
-    $routeProvider.
-    when('/', {
-      template: 'test'
-    }).
-    when('/recipes', {
-      template: '<recipe-list></recipe-list>'
-    }).
-    otherwise('/404');
-
-    $locationProvider.html5Mode(true);
-  });
-```
-
-### Filtering and Sorting (optional)
-
-```html
-<ul>
-    <li>
-        <p>
-            Search: <input ng-model="$ctrl.query" />
-        </p>
-        <p>
-            Sort by:
-            <select ng-model="$ctrl.orderProp">
-                <option value="title">Alphabetical</option>
-                <option value="date">Newest</option>
-            </select>
-        </p>
-    </li>
-</ul>
-```
-
-`<li ng-repeat="recipe in $ctrl.recipes | filter:$ctrl.query | orderBy:$ctrl.orderProp">`
-
-`this.orderProp = 'date';`
-
-
-### Notes
-
-
-```css
-.highlight {
-  transition: all 0.2s;
-  position: absolute;
-  top: 0;
-  background: rgba(255,255,255,0.2);
-  left: 0;
-  z-index: 1;
-  display: block;
-  pointer-events: none 
-  }
-```
-
-```js
-const highlight = document.createElement('span');
-highlight.classList.add('highlight');
-document.body.append(highlight);
-
-function highlightLink() {
-	const linkCoords = this.getBoundingClientRect();
-	const coords = {
-      width: linkCoords.width,
-      height: linkCoords.height,
-      top: linkCoords.top + window.scrollY,
-      left: linkCoords.left + window.scrollX
-    };
-
-    highlight.style.width = `${coords.width}px`;
-    highlight.style.height = `${coords.height}px`;
-    highlight.style.transform = `translate(${coords.left}px, ${coords.top}px)`;
-}
-
-triggers.forEach(panel => panel.addEventListener('mouseenter', highlightLink));
-```
-
-```js
-function highlightLink() {
-	console.log(this)
-}
-```
-
-```js
-function highlightLink() {
-	const linkCoords = this.getBoundingClientRect();
-    console.log(linkCoords)
-}
-```
-
-```js
-function highlightLink() {
-	const linkCoords = this.getBoundingClientRect();
-    highlight.style.width = `${linkCoords.width}px`;
-    highlight.style.height = `${linkCoords.height}px`;
-}
-```
-
-```js
-function highlightLink() {
-	const linkCoords = this.getBoundingClientRect();
-    highlight.style.width = `${linkCoords.width}px`;
-    highlight.style.height = `${linkCoords.height}px`;
-    highlight.style.transform = `translate(100px, 100px)`;
-}
-```
-
-
-
-<nav ng-include=" 'includes/nav.html' "></nav>
-
-
-```
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-ng-app="myApp">
 <head>
-  <meta charset="UTF-8">
-  <title>Recipes</title>
-  <script src="https://code.angularjs.org/1.6.2/angular.min.js"></script>
-  <script src="https://code.angularjs.org/1.6.2/angular-route.js"></script>
-  <script src="js/foodapp.module.js"></script>
-  <script src="js/foodapp.config.js"></script>
-  <script src="js/recipes/recipe-list.component.js"></script>
-
-  <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
-
-  <base href="/">
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="javascripts/bundle.js"></script>
 </head>
-<body ng-app="foodApp">
-  <nav ng-include=" 'includes/nav.html' "></nav>
-  <div ng-view></div>
-  <script src="js/scripts.js"></script>
+<body>
+	<nav data-ng-controller="NavController">
+		
+	</nav>
 </body>
 </html>
 ```
 
+navitems.js:
+
+```
+const navItems = [
+{
+  label: 'Watchlist',
+  link: 'watchlist',
+  header: 'Market intelligence now revolves around what you need',
+  content: `
+  <ul>
+  <li>Create topical tiles with the content you want</li>
+  <li>Access subscribed research without having to check your email</li>
+  <li>Compile and share research based on your interests</li>
+  <li>Access your Barclays Live charts on the go</li>
+  <li>Go deeper into topics in your own time, online or offline</li>
+  </ul>`
+},
+{
+  label: 'Research',
+  link: 'research',
+  header: 'Accessing your content has never been easier',
+  content: `
+  <ul>
+  <li>Filter content by asset class, region, industry or currency</li>
+  <li>View what’s trending today, this week, this month</li>
+  <li>Browse a magazine or publication and add it to your Watchlist</li>
+  <li>Select text in publications to highlight and annotate</li>
+  <li>Create a Quick List and save it to your Workbook for easy access in the future</li>
+  </ul>`
+},
+{
+  label: 'Markets',
+  link: 'markets',
+  header: 'The pulse of the market is right at your fingertips',
+  content: `
+  <ul>
+  <li>Check live FX pricing from BARX</li>
+  <li>Monitor market data across asset classes</li>
+  <li>Access Barclays Indices, Credit Center, TRENDS and more</li>
+  <li>View companies under coverage across equities and credit</li>
+  <li>Access financial forecasts from our equity analysts</li>
+  </ul>`
+},
+{
+  label: 'Workbook',
+  link: 'workbook',
+  header: 'Save and organize content for offline reading',
+  content: `
+  <ul>
+  <li>Look for Add to Workbook wherever you are in the app</li>
+  <li>Create folders in your Workbook with the content you like</li>
+  <li>Add your annotated publications to the Workbook</li>
+  <li>Access content in your Workbook online or offline</li>
+  </ul>`
+},
+{
+  label: 'Connect',
+  link: 'connect',
+  header: 'A new interactive experience',
+  content: `
+  <ul>
+  <li>View messages from your Barclays research analysts and sales teams</li>
+  <li>Reply to your Barclays contacts on the go</li>
+  <li>Share tiles, publications and charts</li>
+  <li>Read messages seamlessly on your tablet and via email</li>
+  </ul>`
+},
+{
+  label: 'Desktop',
+  link: 'desktop',
+  header: 'Start on your tablet, continue on the desktop',
+  content: `
+  <ul>
+  <li>Work seamlessly on the desktop and on your tablet</li>
+  <li>View your Watchlist, your Workbook and Connect from the tablet and the desktop</li>
+  <li>Create charts on the desktop and view them on the app</li>
+  </ul>`
+},
+{
+  label: 'FAQ',
+  link: 'faq',
+  header: 'FAQ',
+  content: `
+  <ul>
+  <li>Work seamlessly on the desktop and on your tablet</li>
+  <li>View your Watchlist, your Workbook and Connect from the tablet and the desktop</li>
+  <li>Create charts on the desktop and view them on the app</li>
+  </ul>`
+}];
+
+```
+
+At bottom of navItems:
+
+`export default navitems;`
+
+Import into myapp.js:
+
+```
+import angular from 'angular';
+import navitems from './src/navitems';
+console.log(navitems);
+```
+
+Declare app to be an instance of an Angular module:
+
+`var app = angular.module('myApp', []);`
+
+`app` is the main Angular space and can be broken down into multiple controllers.
+
+Add our data to the NavController:
+
+```js
+import angular from 'angular';
+import navitems from './src/navitems';
+console.log(navitems); 
+
+var app = angular.module('myApp', []);
+
+app.controller("NavController", function( $scope ) {
+  $scope.navitems = navitems
+  })
+```
+
+[Scope](https://docs.angularjs.org/guide/scope#!) is the glue between application controller and the view.
+
+Test to see if it is available in our view.
+
+Use Angular to build out again in index.html:
+
+```html
+	<nav data-ng-controller="NavController">
+		<ul id="nav-links">
+			<li data-ng-repeat="navitem in navitems">
+				<a href=#{{navitem.link}}>{{navitem.label}}</a>
+			</li>
+		</ul>
+	</nav>
+```
+
+`{{  }}` - moustaches or handlebars are similar to JavaScript Template Strings (`${   }`). These are known as [expressions](https://docs.angularjs.org/guide/expression).
+
+`ng-repeat` is a directive. There are [many directives](https://docs.angularjs.org/api/).
+
+Build out the content:
+
+```html
+	<div data-ng-controller="ContentController">
+		<div data-ng-repeat="navitem in navitems">
+			<h2>{{ navitem.label }}</h2>
+			<h3>{{ navitem.header }}</h3>
+		</div>
+	</div>
+```
+
+```
+app.controller("ContentController", function( $scope ) {
+  $scope.navitems = navitems
+  })
+```
+
+Note - injecting html into a page is considered unsafe. 
+
+Try adding `{{ navitem.content }}`:
+
+```html
+	<div data-ng-controller="ContentController">
+		<div data-ng-repeat="navitem in navitems">
+			<h2>{{ navitem.label }}</h2>
+			<h3>{{ navitem.header }}</h3>
+			{{ navitem.content }}
+		</div>
+	</div>
+```
+
+Load [sanitize](https://docs.angularjs.org/api/ngSanitize):
+
+Back in the 'old' days you would use the `<script>` ta, e.g.:
+`<script src="https://code.angularjs.org/1.5.8/angular-sanitize.min.js"></script>`
+
+Today we are using webpack and bundling
+
+`npm install angular-sanitize@1.6.2 --save`
+
+```js
+import angular from 'angular';
+import ngSanitize from 'angular-sanitize';
+```
+
+Use [injection](https://docs.angularjs.org/guide/di) to make it available to the app:
+
+`var app = angular.module('myApp', ['ngSanitize']);`
+
+We can then use:
+
+`<div ng-bind-html="navitem.content"></div>`
+
+## Notes
 
 
+`npm install angular-route@1.6.2 --save-dev`
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+`import ngRoute from 'angular-route';`
