@@ -1000,7 +1000,17 @@ We can then use:
 
 ## Notes
 
+```js
+const navbar = document.querySelector('nav')
+const markup = `
+<ul>
+${navitems.map( navitem => `<li><a href="${navitem.link}">${navitem.label}</a></li>`).join('')}
+</ul>
+`
+navbar.innerHTML = markup;
 
+console.log(navbar)
+```
 `npm install angular-route@1.6.2 --save`
 
 `import ngRoute from 'angular-route';`
