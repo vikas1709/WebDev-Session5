@@ -1,152 +1,8 @@
-# Session 5
+# V - Express, Webpack, and Angular
 
-## Angular as a Templating Engine
+In this session we will explore using Express with Webpack for bundling. We will also use Angular as our templating language.
 
-Let's look at Angular as our page templating language.
-
-In the terminal, cd into the angular folder and set it up with npm install and run `nodemon app.js`
-
-Add a link to Angular in the head of index.html:
-
-`<script src="https://code.angularjs.org/1.5.8/angular.js"></script>`
-
-HTML5 introduced the `data-` [attribute](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes).
-
-Angular uses this concept to extend html with [directives](https://www.w3schools.com/angular/angular_directives.asp) such as data-ng-app, data-ng-controller, data-ng-repeat
-
-`<html lang="en"  data-ng-app>`
-
-
-
-### Angular Directives
-
-Simple Angular directives:
-
-1. ng-app − This directive starts an AngularJS Application.
-2. ng-init − This directive initializes application data. (We won't use it except for the simple examples below.)
-3. ng-model − This directive defines the model that is variable to be used in AngularJS.
-4. ng-repeat − This directive repeats html elements for each item in a collection.
-
-```html
-<div class="site-wrap"  ng-init="messageText = 'Hello World!'">
-
-<input ng-model="messageText" size="30"/>
-<p>Everybody shout "{{ messageText | uppercase }}"</p>
-```
-
-This is a demonstration of [data binding](https://docs.angularjs.org/guide/databinding) and [filtering](https://docs.angularjs.org/api/ng/filter) to uppercase.
-
-Alernates 1 - using an object
-
-`ng-init="greeting = { greeter: 'Daniel' , message: 'Hello World' }"`
-
-```html
-<input type="text" ng-model="greeting.greeter" size="30"/>
-<input type="text" ng-model="greeting.message" size="30"/>
-{{greeting.greeter }} says "{{ greeting.message }}"
-```
-
-Alternates 2 - using ng-repeat with an array
-
-```html
-<div class="site-wrap" ng-init="portfolios = ['Call of Booty', 'The Sack of the Innocents', 'Pipe and First Mate']" >
-
-<ul>
-  <li ng-repeat="portfolio in portfolios">
-    {{ portfolio }}
-  </li>
-</ul>
-```
-
-Alernate 3 - [filtering](https://docs.angularjs.org/api/ng/filter) and ordering on an array of objects
-
-```html
-<div class="site-wrap" ng-init="portfolios = [
-{ name: 'Call of Booty', date: '2013-09-01' },
-{ name: 'The Sack of the Innocents', date: '2014-04-15' },
-{ name: 'Pipe and First Mate', date: '2012-10-01' } ]">
-
-<p>Filter list: <input ng-model="searchFor" size="30"/></p>
-
-<ul>
-  <li ng-repeat="portfolio in portfolios | filter:searchFor | orderBy:'date' ">
-  {{ portfolio.name  }}</li>
-</ul>
-```
-
-ngClass:
-
-```html
-<ul>
-  <li ng-repeat="portfolio in portfolios |
-  filter:searchFor |
-  orderBy:'date'"
-  ng-class="{ even: $even, odd: $odd }">
-  {{ portfolio.name  }}</li>
-</ul>
-```
-
-with:
-
-```html
-<style>
-  .even { color: red; }
-  .odd { color: blue; }
-</style>
-```
-
-keys and values of the array:
-
-```html
-<ul>
-  <li ng-repeat="(key, value) in portfolios">
-      <strong>{{key}}</strong> - {{value}}
-  </li>
-</ul>
-```
-
-## Components
-
-Create: `test.js`:
-
-```js
-angular.module('myApp', []);
-
-angular.module('myApp').component('greetUser', {
-    template: 'Hello, {{$ctrl.user}}!',
-    controller: function GreetUserController() {
-        this.user = 'world';
-    }
-});
-```
-
-Create `test.html`:
-
-```html
-<!DOCTYPE html>
-<html>
-
-<head>
-  <meta charset="utf-8" />
-  <title>AngularJS Module</title>
-  <script src="https://code.angularjs.org/1.5.8/angular.js"></script>
-  <script src="test.js"></script>
-</head>
-
-<body>
-
-  <div ng-app="myApp">
-    <greet-user></greet-user>
-  </div>
-
-</body>
-
-</html>
-```
-
-
-## Angular on Express with Babel and Webpack
-
+## Express with Babel and Webpack
 
 Install [express generator](http://expressjs.com/en/starter/generator.html):
 
@@ -158,11 +14,13 @@ Generate a site:
 
 `$ express --view=pug myapp --css sass`
 
+Rename the folders in public?
+
 run:
 
 `npm install` and `DEBUG=myapp:* npm start` (see the [generator page](http://expressjs.com/en/starter/generator.html) for Windows alternative)
 
-Inspect the new directory. NOte how the functionality is broken up into multiple files.
+Inspect the new directory. Note how the functionality is broken up into multiple files.
 
 Test it at `http://localhost:3000/` using:
 
@@ -213,12 +71,12 @@ p My animal is #{upAnimal}
 
 Additional installs for webpack and babel.
 
-`$ npm i --save-dev babel-core babel-loader babel-preset-env webpack concurrently`
+`$ npm i --save-dev babel-core babel-loader babel-preset-env webpack webpack-cli concurrently`
 
 Demo on babeljs.io:
 
 ```js
-const getMessage = () => "Hello World";
+const getMessage = () => 'Hello World';
 document.getElementById('output').innerHTML = getMessage();
 ```
 
@@ -229,21 +87,35 @@ We'll be using babel with webpack:
 create webpack.config.js:
 
 ```js
-const webpack = require('webpack')
+const path = require('path');
 
 module.exports = {
-    devtool: 'source-map',
-    entry: './myapp.js',
-    output: {
-        filename: './public/javascripts/bundle.js'
-    }
-}
+  devtool: 'source-map',
+  mode: 'production',
+  entry: './myapp.js',
+  output: {
+    path: path.resolve(__dirname, './public/js/'),
+    filename: 'bundle.js'
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        query: {
+          presets: ['env']
+        }
+      }
+    ]
+  }
+};
 ```
 
 Create `myapp.js`
 
 ```js
-const getMessage = () => "Hello World";
+const getMessage = () => 'Hello World';
 document.getElementById('output').innerHTML = getMessage();
 ```
 
@@ -261,34 +133,6 @@ Add webpack and a boom to our scripts:
 
 Note bundle.js and map.
 
-Add Babel to Webpack:
-
-```js
-const webpack = require('webpack')
-
-module.exports = {
-	devtool: 'source-map',
-	entry: './myapp.js',
-	output: {
-		filename: './public/javascripts/bundle.js'
-	},
-	module: {
-		loaders: [{
-			test: /\.js$/,
-			exclude: /node_modules/,
-			loader: 'babel-loader',
-			query: {
-				presets: ['env']
-			}
-		}]
-	}
-}
-```
-
-and retart the server again.
-
-Note bundle.js
-
 Add link to layout.jade (be sure to use spaces or tabs:
 
 ```
@@ -296,17 +140,17 @@ doctype html
 html
   head
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/css/style.css')
   body
     block content
-    script(src='/javascripts/bundle.js')
+    script(src='/js/bundle.js')
 ```
 
 Refresh the page to compile jade.
 
 Add an #output div:
 
-```
+```txt
 extends layout
 
 block content
@@ -320,7 +164,7 @@ block content
 Refresh the page to see the message:
 
 ```js
-const getMessage = () => "Hello World";
+const getMessage = () => 'Hello World';
 document.getElementById('output').innerHTML = getMessage();
 ```
 
@@ -331,42 +175,41 @@ Test with [lodash](https://lodash.com) in myapp.
 ```js
 import { uniq } from 'lodash';
 
-const person = [ 1,1,3,45,8,67,8 ]
+const person = [1, 1, 3, 45, 8, 67, 8];
 
-console.log(uniq(person))
+console.log(uniq(person));
 ```
 
-Note: your bundle just got pretty large.
+Note: the console in question here is the browsers'.
 
-Add uglify processing to webpack
+Also note: your bundle just got pretty large.
+
+Change webpack's `mode` to development:
 
 ```js
-const webpack = require('webpack')
+const path = require('path');
 
 module.exports = {
-	devtool: 'source-map',
-	entry: './myapp.js',
-	output: {
-		filename: './public/javascripts/bundle.js'
-	},
-	module: {
-		loaders: [{
-			test: /\.js$/,
-			exclude: /node_modules/,
-			loader: 'babel-loader',
-			query: {
-				presets: ['env']
-			}
-		}]
-	},
-	plugins: [
-	new webpack.optimize.UglifyJsPlugin({
-		compress: { warnings: false },
-		output: { comments: false },
-		sourceMap: true
-	})
-	]
-}
+  devtool: 'source-map',
+  mode: 'development',
+  entry: './myapp.js',
+  output: {
+    path: path.resolve(__dirname, './public/js/'),
+    filename: 'bundle.js'
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        query: {
+          presets: ['env']
+        }
+      }
+    ]
+  }
+};
 ```
 
 Restart the processes with boom! and inspect the bundle.
@@ -378,7 +221,7 @@ Create `src` directory with `config.js` inside.
 Edit config.js:
 
 ```js
-const apiKey = 'abcdef'
+const apiKey = 'abcdef';
 ```
 
 Import it into myapp.js (note: paths are not necessary for node modules):
@@ -390,7 +233,7 @@ console.log(apiKey);
 
 Refresh the browser. Note empty object.
 
-Export the data - using *default* and *named* exports.
+Export the data - using _default_ and _named_ exports.
 
 In config.js:
 
@@ -409,7 +252,7 @@ import foo from './src/config';
 console.log(foo);
 ```
 
-Modules can only have one default export but *can* have multiple named exports.
+Modules can only have one default export but _can_ have multiple named exports.
 
 A named export:
 
@@ -418,7 +261,7 @@ A named export:
 requires an import that looks like:
 
 ```js
-import {apiKey} from './src/config';
+import { apiKey } from './src/config';
 console.log(apiKey);
 ```
 
@@ -430,7 +273,7 @@ export const url = 'https://mlab.com';
 ```
 
 ```js
-import {apiKey, url} from './src/config';
+import { apiKey, url } from './src/config';
 console.log(apiKey, url);
 ```
 
@@ -442,13 +285,13 @@ Functions can be internal to a module or exported:
 export const apiKey = 'abcdef';
 export const url = 'https://mlab.com';
 
-export function sayHi(name){
-	console.log(`Say hello ${name}`)
+export function sayHi(name) {
+  console.log(`Say hello ${name}`);
 }
 ```
 
 ```js
-import {apiKey, url, sayHi} from './src/config';
+import { apiKey, url, sayHi } from './src/config';
 sayHi('daniel');
 ```
 
@@ -468,7 +311,6 @@ app.js:
 var routes = require('./routes/index');
 ```
 
-
 ## Angular as a Templating Engine
 
 Let's return to our look at using an older (but still quite common and actively maintained) version of Angular as our page templating language.
@@ -480,11 +322,11 @@ Remove views and jade in app.js
 // app.set('view engine', 'jade');
 ```
 
-Add to routes index.js:
+Add to routes/index.js:
 
 ```js
-  // res.render('index', { title: 'Express', animal: req.query.animal });
-  res.sendFile(__dirname + '/public/index.html')
+// res.render('index', { title: 'Express', animal: req.query.animal });
+res.sendFile(__dirname + '/public/index.html');
 ```
 
 Create index.html page in public:
@@ -493,27 +335,27 @@ Create index.html page in public:
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>Document</title>
+  <meta charset="UTF-8">
+  <title>Document</title>
 </head>
 <body>
-	<p>It works!</p>
+  <p>It works!</p>
 </body>
 </html>
 ```
 
-Link to bundle.js
+Add a link to bundle.js
 
 ```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>Document</title>
-	<script src="/javascripts/bundle.js"></script>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script src="/js/bundle.js"></script>
 </head>
 <body>
-	<p>It works!</p>
+  <p>It works!</p>
 </body>
 </html>
 ```
@@ -528,46 +370,20 @@ Import it into myapp.js:
 import angular from 'angular';
 ```
 
-Remove uglify processing from webpack.
-
-```js
-const webpack = require('webpack')
-
-module.exports = {
-	devtool: 'source-map',
-	entry: './myapp.js',
-	output: {
-		filename: './public/javascripts/bundle.js'
-	},
-	module: {
-		loaders: [{
-			test: /\.js$/,
-			exclude: /node_modules/,
-			loader: 'babel-loader',
-			query: {
-				presets: ['env']
-			}
-		}]
-	}
-}
-```
-
 HTML5 introduced the `data-` [attribute](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes).
 
 Angular uses this concept to extend html with [directives](https://www.w3schools.com/angular/angular_directives.asp) such as data-ng-app, data-ng-controller, data-ng-repeat
 
-`<html lang="en"  data-ng-app>`
+`<html lang="en" data-ng-app>`
 
 ```html
 <!DOCTYPE html>
 <html lang="en" data-ng-app>
 
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    <script src="/javascripts/bundle.js"></script>
+    <script src="/js/bundle.js"></script>
 </head>
 
 <body>
@@ -576,7 +392,6 @@ Angular uses this concept to extend html with [directives](https://www.w3schools
 
 </html>
 ```
-
 
 ### Review: Angular Directives
 
@@ -588,10 +403,10 @@ Simple Angular directives:
 1. ng-repeat − this directive repeats html elements for each item in a collection
 
 ```html
-	<div class="site-wrap"  ng-init="messageText = 'Hello World!'">
-		<input ng-model="messageText" size="30"/>
-		<p>Everybody shout "{{ messageText | uppercase }}"</p>
-	</div>
+  <div class="site-wrap"  ng-init="messageText = 'Hello World!'">
+    <input ng-model="messageText" size="30"/>
+    <p>Everybody shout "{{ messageText | uppercase }}"</p>
+  </div>
 ```
 
 This is a demonstration of [data binding](https://docs.angularjs.org/guide/databinding) and [filtering](https://docs.angularjs.org/api/ng/filter) to uppercase.
@@ -611,13 +426,13 @@ Alternate 1 - using an object, e.g.:
 Alternate 2 - using ng-repeat with an array
 
 ```html
-	<div class="site-wrap" ng-init="portfolios = ['Call of Booty', 'The Sack of the Innocents', 'Pipe and First Mate']" >
-		<ul>
-			<li ng-repeat="portfolio in portfolios">
-				{{ portfolio }}
-			</li>
-		</ul>
-	</div>
+  <div class="site-wrap" ng-init="portfolios = ['Call of Booty', 'The Sack of the Innocents', 'Pipe and First Mate']" >
+    <ul>
+      <li ng-repeat="portfolio in portfolios">
+        {{ portfolio }}
+      </li>
+    </ul>
+  </div>
 ```
 
 Alernate 3 - [filtering](https://docs.angularjs.org/api/ng/filter) and ordering on an array of objects
@@ -660,34 +475,36 @@ with:
 keys and values of the array:
 
 ```html
-	<div class="site-wrap" ng-init="portfolios = [
-	{ name: 'Call of Booty', date: '2013-09-01' },
-	{ name: 'The Sack of the Innocents', date: '2014-04-15' },
-	{ name: 'Pipe and First Mate', date: '2012-10-01' } ]">
+  <div class="site-wrap" ng-init="portfolios = [
+  { name: 'Call of Booty', date: '2013-09-01' },
+  { name: 'The Sack of the Innocents', date: '2014-04-15' },
+  { name: 'Pipe and First Mate', date: '2012-10-01' } ]">
 
-	<ul>
-		<li ng-repeat="(key, value) in portfolios">
-			<strong>{{key}}</strong> - {{value}}
-		</li>
-	</ul>
+  <ul>
+    <li ng-repeat="(key, value) in portfolios">
+      <strong>{{key}}</strong> - {{value}}
+    </li>
+  </ul>
 ```
 
 ## Named Apps
+
+`ng-app=myApp`
 
 ```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>Document</title>
-	<script src="javascripts/bundle.js"></script>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script src="js/bundle.js"></script>
 </head>
 <body>
-	<div class="site-wrap" data-ng-app=myApp >
-		<div data-ng-controller="myCtrl">
-			Name: <input data-ng-model="name">
-		</div>
-	</div>
+  <div class="site-wrap" data-ng-app=myApp >
+    <div data-ng-controller="myCtrl">
+      Name: <input data-ng-model="name">
+    </div>
+  </div>
 </body>
 </html>
 ```
@@ -697,7 +514,7 @@ In myapp.js:
 ```js
 var app = angular.module('myApp', []);
 app.controller('myCtrl', function($scope) {
-    $scope.name = "John Doe";
+  $scope.name = 'John Doe';
 });
 ```
 
@@ -705,7 +522,7 @@ Refactored:
 
 ```js
 var app = angular.module('myApp', []);
-app.controller('myCtrl', ($scope) => $scope.name = "John Doe");
+app.controller('myCtrl', $scope => ($scope.name = 'John Doe'));
 ```
 
 ## Angular Components
@@ -720,10 +537,10 @@ import angular from 'angular';
 angular.module('myApp', []);
 
 angular.module('myApp').component('greetUser', {
-    template: 'Hello, {{$ctrl.user}}!',
-    controller: function GreetUserController() {
-        this.user = 'world';
-    }
+  template: 'Hello, {{$ctrl.user}}!',
+  controller: function GreetUserController() {
+    this.user = 'world';
+  }
 });
 ```
 
@@ -731,15 +548,13 @@ angular.module('myApp').component('greetUser', {
 
 ```html
 <body>
-
   <div ng-app="myApp">
     <greet-user></greet-user>
   </div>
-
 </body>
 ```
 
-or we can use template strings and store the module in a variable:
+We can use template strings and store the module in a variable:
 
 ```js
 import angular from 'angular';
@@ -747,10 +562,10 @@ import angular from 'angular';
 var app = angular.module('myApp', []);
 
 app.component('greetUser', {
-    template: `Hello, {{$ctrl.user}}!`,
-    controller: function GreetUserController() {
-        this.user = 'world';
-    }
+  template: `Hello, {{$ctrl.user}}!`,
+  controller: function GreetUserController() {
+    this.user = 'world';
+  }
 });
 ```
 
@@ -758,40 +573,32 @@ By creating multiple components we will switch out the content depending on the 
 
 ```js
 app.component('byeUser', {
-    template: `Bye, {{$ctrl.user}}!`,
-    controller: function GreetUserController() {
-        this.user = 'cruel world';
-    }
+  template: `Bye, {{$ctrl.user}}!`,
+  controller: function GreetUserController() {
+    this.user = 'cruel world';
+  }
 });
 ```
 
 ```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Document</title>
-  <script src="javascripts/bundle.js"></script>
-</head>
 <body>
   <div ng-app="myApp">
     <bye-user></bye-user>
   </div>
 </body>
-</html>
 ```
 
 ## PROCESS
 
-Create navitems.js in src:
+Recreate navitems.js in src:
 
-```
+```js
 const navitems = [
-{
-  label: 'Watchlist',
-  link: 'watchlist',
-  header: 'Market intelligence now revolves around what you need',
-  content: `
+  {
+    label: 'Watchlist',
+    link: 'watchlist',
+    header: 'Market intelligence now revolves around what you need',
+    content: `
   <ul>
   <li>Create topical tiles with the content you want</li>
   <li>Access subscribed research without having to check your email</li>
@@ -799,12 +606,12 @@ const navitems = [
   <li>Access your Barclays Live charts on the go</li>
   <li>Go deeper into topics in your own time, online or offline</li>
   </ul>`
-},
-{
-  label: 'Research',
-  link: 'research',
-  header: 'Accessing your content has never been easier',
-  content: `
+  },
+  {
+    label: 'Research',
+    link: 'research',
+    header: 'Accessing your content has never been easier',
+    content: `
   <ul>
   <li>Filter content by asset class, region, industry or currency</li>
   <li>View what’s trending today, this week, this month</li>
@@ -812,12 +619,12 @@ const navitems = [
   <li>Select text in publications to highlight and annotate</li>
   <li>Create a Quick List and save it to your Workbook for easy access in the future</li>
   </ul>`
-},
-{
-  label: 'Markets',
-  link: 'markets',
-  header: 'The pulse of the market is right at your fingertips',
-  content: `
+  },
+  {
+    label: 'Markets',
+    link: 'markets',
+    header: 'The pulse of the market is right at your fingertips',
+    content: `
   <ul>
   <li>Check live FX pricing from BARX</li>
   <li>Monitor market data across asset classes</li>
@@ -825,54 +632,54 @@ const navitems = [
   <li>View companies under coverage across equities and credit</li>
   <li>Access financial forecasts from our equity analysts</li>
   </ul>`
-},
-{
-  label: 'Workbook',
-  link: 'workbook',
-  header: 'Save and organize content for offline reading',
-  content: `
+  },
+  {
+    label: 'Workbook',
+    link: 'workbook',
+    header: 'Save and organize content for offline reading',
+    content: `
   <ul>
   <li>Look for Add to Workbook wherever you are in the app</li>
   <li>Create folders in your Workbook with the content you like</li>
   <li>Add your annotated publications to the Workbook</li>
   <li>Access content in your Workbook online or offline</li>
   </ul>`
-},
-{
-  label: 'Connect',
-  link: 'connect',
-  header: 'A new interactive experience',
-  content: `
+  },
+  {
+    label: 'Connect',
+    link: 'connect',
+    header: 'A new interactive experience',
+    content: `
   <ul>
   <li>View messages from your Barclays research analysts and sales teams</li>
   <li>Reply to your Barclays contacts on the go</li>
   <li>Share tiles, publications and charts</li>
   <li>Read messages seamlessly on your tablet and via email</li>
   </ul>`
-},
-{
-  label: 'Desktop',
-  link: 'desktop',
-  header: 'Start on your tablet, continue on the desktop',
-  content: `
+  },
+  {
+    label: 'Desktop',
+    link: 'desktop',
+    header: 'Start on your tablet, continue on the desktop',
+    content: `
   <ul>
   <li>Work seamlessly on the desktop and on your tablet</li>
   <li>View your Watchlist, your Workbook and Connect from the tablet and the desktop</li>
   <li>Create charts on the desktop and view them on the app</li>
   </ul>`
-},
-{
-  label: 'FAQ',
-  link: 'faq',
-  header: 'FAQ',
-  content: `
+  },
+  {
+    label: 'FAQ',
+    link: 'faq',
+    header: 'FAQ',
+    content: `
   <ul>
   <li>Work seamlessly on the desktop and on your tablet</li>
   <li>View your Watchlist, your Workbook and Connect from the tablet and the desktop</li>
   <li>Create charts on the desktop and view them on the app</li>
   </ul>`
-}];
-
+  }
+];
 ```
 
 At bottom of navItems:
@@ -881,7 +688,7 @@ At bottom of navItems:
 
 Import into myapp.js:
 
-```
+```js
 import angular from 'angular';
 import navitems from './src/navitems';
 console.log(navitems);
@@ -895,11 +702,11 @@ Place a section of the page under the influence of a controller:
 <head>
   <meta charset="UTF-8">
   <title>Document</title>
-  <script src="javascripts/bundle.js"></script>
+  <script src="js/bundle.js"></script>
 </head>
 <body>
   <nav data-ng-controller="NavController">
-    
+
   </nav>
 </body>
 </html>
@@ -916,13 +723,13 @@ Add our data to the NavController:
 ```js
 import angular from 'angular';
 import navitems from './src/navitems';
-console.log(navitems); 
+console.log(navitems);
 
 var app = angular.module('myApp', []);
 
-app.controller("NavController", function( $scope ) {
-  $scope.navitems = navitems
-  })
+app.controller('NavController', function($scope) {
+  $scope.navitems = navitems;
+});
 ```
 
 [Scope](https://docs.angularjs.org/guide/scope#!) is the glue between application controller and the view.
@@ -932,48 +739,52 @@ Test to see if it is available in our view.
 Use Angular to build out again in index.html:
 
 ```html
-	<nav data-ng-controller="NavController">
-		<ul id="nav-links">
-			<li data-ng-repeat="navitem in navitems">
-				<a href=#{{navitem.link}}>{{navitem.label}}</a>
-			</li>
-		</ul>
-	</nav>
+  <nav data-ng-controller="NavController">
+    <ul id="nav-links">
+      <li data-ng-repeat="navitem in navitems">
+        <a href=#{{navitem.link}}>{{navitem.label}}</a>
+      </li>
+    </ul>
+  </nav>
 ```
 
-`{{  }}` - moustaches or handlebars are similar to JavaScript Template Strings (`${   }`). These are known as [expressions](https://docs.angularjs.org/guide/expression).
+`{{ }}` - moustaches or handlebars are similar to JavaScript Template Strings (`${ }`). These are known as [expressions](https://docs.angularjs.org/guide/expression).
 
 `ng-repeat` is a directive. There are [many directives](https://docs.angularjs.org/api/).
 
-Build out the content:
+Build out the content.
+
+In index.html:
 
 ```html
-	<div data-ng-controller="ContentController">
-		<div data-ng-repeat="navitem in navitems">
-			<h2>{{ navitem.label }}</h2>
-			<h3>{{ navitem.header }}</h3>
-		</div>
-	</div>
+  <div data-ng-controller="ContentController">
+    <div data-ng-repeat="navitem in navitems">
+      <h2>{{ navitem.label }}</h2>
+      <h3>{{ navitem.header }}</h3>
+    </div>
+  </div>
 ```
+
+In myapp.js:
 
 ```js
-app.controller("ContentController", function( $scope ) {
-  $scope.navitems = navitems
-  })
+app.controller('ContentController', function($scope) {
+  $scope.navitems = navitems;
+});
 ```
 
-Note - injecting html into a page is considered unsafe. 
+Note - injecting html into a page is considered unsafe.
 
 Try adding `{{ navitem.content }}`:
 
 ```html
-	<div data-ng-controller="ContentController">
-		<div data-ng-repeat="navitem in navitems">
-			<h2>{{ navitem.label }}</h2>
-			<h3>{{ navitem.header }}</h3>
-			{{ navitem.content }}
-		</div>
-	</div>
+  <div data-ng-controller="ContentController">
+    <div data-ng-repeat="navitem in navitems">
+      <h2>{{ navitem.label }}</h2>
+      <h3>{{ navitem.header }}</h3>
+      {{ navitem.content }}
+    </div>
+  </div>
 ```
 
 Load [sanitize](https://docs.angularjs.org/api/ngSanitize):
@@ -1001,19 +812,19 @@ We can then use:
 ## Notes
 
 ```js
-const navbar = document.querySelector('nav')
+const navbar = document.querySelector('nav');
 const markup = `
 <ul>
-${navitems.map( navitem => `<li><a href="${navitem.link}">${navitem.label}</a></li>`).join('')}
+${navitems.map(navitem => `<li><a href="${navitem.link}">${navitem.label}</a></li>`).join('')}
 </ul>
-`
+`;
 navbar.innerHTML = markup;
 
-console.log(navbar)
+console.log(navbar);
 ```
+
 `npm install angular-route@1.6.2 --save`
 
 `import ngRoute from 'angular-route';`
 
 `var app = angular.module('myApp', [ngRoute, ngSanitize]);`
-
