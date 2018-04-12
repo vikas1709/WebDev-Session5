@@ -2,6 +2,11 @@
 
 In this session we will explore using Express with Webpack for JavaScript bundling. We will use Angular as our templating language.
 
+## Homework
+
+1. Watch a short video on [ES6 Modules](https://youtu.be/_3oSWwapPKQ)
+1. Create an Angular component for the page contents
+
 ## Express Generator
 
 Install [express generator](http://expressjs.com/en/starter/generator.html):
@@ -20,31 +25,13 @@ Rename the folders in public to `js, css, img`.
 
 Run:
 
-`npm install` and `DEBUG=myapp:* npm start` (see the [generator page](http://expressjs.com/en/starter/generator.html) for Windows alternative)
+`npm install` and `DEBUG=myapp:* npm start` (see the [generator page](http://expressjs.com/en/starter/generator.html) for Windows alternative) or just `npm start`.
 
-Inspect the new directory. Note how the functionality is broken up into multiple files.
+Inspect the new directory. Note how functionality is divided across multiple files and uses `require` and `module.exports` to communicate between files in a Node application.
 
 Test it at `http://localhost:3000/`.
 
 ### Test the Vanilla Installation
-
-in Routes > index.js:
-
-```js
-res.render('index', { title: 'Express', animal: req.query.animal });
-```
-
-Pug: variables into text (in views):
-
-```
-`p.hello My animal's name is #{animal}`
-```
-
-```
-http://localhost:3000/?animal=dog
-```
-
-Restart the server.
 
 Set node command to nodemon in package.json (be sure you have nodemon installed first):
 
@@ -54,16 +41,35 @@ Set node command to nodemon in package.json (be sure you have nodemon installed 
   },
 ```
 
-Pug variables into attributes:
+Restart the server.
+
+In `routes/index.js`:
+
+```js
+res.render('index', { title: 'Express', animal: req.query.animal });
+```
+
+Pug: variables into text (in `views/index.jade`):
+
+```
+`p.hello My animal's name is #{animal}`
+```
+
+```
+http://localhost:3000/?animal=dog
+```
+
+Pug variables into attributes (`views/index.jade`):
 
 ```
 img.animal(src="https://picsum.photos/400/200?random" alt="#{animal}")
 ```
 
-Like EJS, Pug allows you to use JavaScript in the template:
+Like EJS, Pug allows you to use JavaScript in the template. You must use either tabs or spaces to next the rendered html:
 
 ```
-img.animal(src="https://picsum.photos/400/200?random" alt=`${animal}`)
+  .image
+    img.animal(src="https://picsum.photos/400/200?random" alt=`${animal}`)
 ```
 
 ```
@@ -71,17 +77,15 @@ img.animal(src="https://picsum.photos/400/200?random" alt=`${animal}`)
 p My animal is #{upAnimal}
 ```
 
-## Babel
+## Babel and Webpack
 
-Additional installs for webpack and babel:
+Additional installs for Webpack and Babel:
 
 `npm i --save-dev babel-core babel-loader babel-preset-env webpack webpack-cli concurrently`
 
-We'll be using babel with webpack:
+We'll be installing [Babel](https://babeljs.io/docs/setup/#installation) with [webpack](https://webpack.js.org/concepts/) support and therefore need a [loader](https://webpack.js.org/loaders/babel-loader/).
 
-`https://babeljs.io/docs/setup/#installation`
-
-Create `webpack.config.js` in the project folder:
+Create `webpack.config.js` in the `myapp` project folder:
 
 ```js
 const path = require('path');
@@ -109,7 +113,7 @@ module.exports = {
 };
 ```
 
-Note the use of the `module.exports` pattern. We saw this in `routes/index.js` as well.
+Note again the use of the `require` and `module.exports` pattern that we saw in `routes/index.js`.
 
 Create `myapp.js` in the project folder:
 
@@ -132,7 +136,7 @@ Add webpack and a boom to our scripts:
 
 Note `public/js/bundle.js` and `bundle.js.map`.
 
-Add a link to our bundle in `layout.jade` (be sure to use spaces or tabs):
+Add a link to our bundle in `layout.jade` (be sure to change the directory names in public):
 
 ```txt
 doctype html
@@ -155,6 +159,8 @@ block content
   p Welcome to #{title}
   - const upAnimal = animal.toUpperCase()
   p My animal is #{upAnimal}
+  .image
+    img.animal(src="https://picsum.photos/400/200?random" alt=`${animal}`)
   #output
 ```
 
@@ -197,7 +203,7 @@ module.exports = {
 };
 ```
 
-Kill and restart the Express installation with boom! and inspect the bundle again. Note that `myapp.js` has been incorporated _and_ translated to ES5 by Babel.
+Kill and restart the Express installation with boom! and inspect the bundle again. Note that `myapp.js` has been incorporated _and_ translated according to our preset by Babel.
 
 ## ES6 Modules
 
@@ -229,7 +235,7 @@ document.getElementById('output').innerHTML = getMessage();
 
 Refresh the browser. Note empty object in the browser's console.
 
-Export the data - using _default_ and _named_ exports.
+Exporting data - using _default_ and _named_ exports.
 
 In `config.js`:
 
@@ -295,32 +301,37 @@ sayHi('daniel');
 
 Review [the documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export) on MDN for options including `import as`, `export as` and exporting multiples.
 
-Note the resemblance (and difference) between module importing above and Node.
-
-In `routes/index.js`:
-
-```js
-module.exports = router;
-```
+Note the resemblance (and difference) between ES6 module importing and Node.
 
 In `app.js`:
 
 ```js
+var express = require('express');
 var routes = require('./routes/index');
+...
+module.exports = app;
+```
+
+In `myapp` and `config`:
+
+```js
+import { apiKey, url, sayHi } from './src/config';
+...
+export default apiKey;
 ```
 
 ## Angular as a Templating Engine
 
 Let's look at using an older - but still common and actively maintained - version of Angular as our page templating language.
 
-Remove views and jade in app.js
+Disable views and view engine in `app.js`:
 
 ```js
 // app.set('views', path.join(__dirname, 'views'));
 // app.set('view engine', 'jade');
 ```
 
-Add to routes/index.js:
+Add to `routes/index.js`:
 
 ```js
 // res.render('index', { title: 'Express', animal: req.query.animal });
@@ -331,15 +342,18 @@ Create index.html page in public:
 
 ```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-ng-app>
+
 <head>
-  <meta charset="UTF-8">
-  <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="/js/bundle.js"></script>
 </head>
+
 <body>
-  <p>It works!</p>
-  <div id="output"></div>
+    <p>It works</p>
 </body>
+
 </html>
 ```
 
@@ -360,7 +374,7 @@ Import it into myapp.js:
 import angular from 'angular';
 ```
 
-Retart the app the boom! and note that your bundle just got very large.
+Retart the app with boom! and note that your bundle just got very large.
 
 HTML5 introduced the `data-` [attribute](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes).
 
@@ -371,17 +385,13 @@ Bootstrap `index.html` with `<html lang="en" data-ng-app>`:
 ```html
 <!DOCTYPE html>
 <html lang="en" data-ng-app>
-
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="/js/bundle.js"></script>
 </head>
-
 <body>
     <p>It works</p>
 </body>
-
 </html>
 ```
 
@@ -403,13 +413,13 @@ Simple Angular directives:
 
 This is a demonstration of [data binding](https://docs.angularjs.org/guide/databinding) and [filtering](https://docs.angularjs.org/api/ng/filter) to uppercase.
 
-`{{ }}` - moustaches or handlebars are similar to JavaScript Template Strings (`${ }`) and are Angular [expressions](https://docs.angularjs.org/guide/expression).
+`{{ }}` - "moustaches" or "handlebars" are similar to JavaScript Template Strings (`${ }`) and are Angular [expressions](https://docs.angularjs.org/guide/expression).
 
 `ng-repeat` is a directive. There are [many directives](https://docs.angularjs.org/api/).
 
 #### Using an Object
 
-`greeting = { greeter: 'Daniel' , message: 'Hello World' }`
+With `greeting = { greeter: 'Daniel' , message: 'Hello World' }`:
 
 ```html
   <div class="site-wrap"  ng-init="greeting = { greeter: 'Daniel' , message: 'Hello World' }"">
@@ -445,7 +455,7 @@ On an array of objects:
 
 <ul>
   <li ng-repeat="portfolio in portfolios | filter:searchFor | orderBy:'date' ">
-  {{ portfolio.name  }}</li>
+  {{ portfolio.name }}</li>
 </ul>
 ```
 
@@ -470,7 +480,7 @@ with these styles:
 </style>
 ```
 
-Keys and values of the array:
+Display the keys and values of the array:
 
 ```html
   <ul>
@@ -482,7 +492,9 @@ Keys and values of the array:
 
 ## Named Apps
 
-`ng-app=myApp`
+We've been using `<html lang="en" data-ng-app>`. You can use named apps to modularize and bootstrap segments of your site. Some use this to integrate Angular with existing code bases.
+
+Use `ng-app=myApp`:
 
 ```html
 <!DOCTYPE html>
@@ -507,16 +519,20 @@ In `myapp.js`:
 ```js
 import angular from 'angular';
 
-var app = angular.module('myApp', []);
+const app = angular.module('myApp', []);
 app.controller('myCtrl', function($scope) {
   $scope.name = 'John Doe';
 });
 ```
 
+[Scope](https://docs.angularjs.org/guide/scope#!) is the "glue" between application controller and the view.
+
+Our `{{name}}` expression is meaningless unless it is evaluated against a specific scope which defines the name property. Scopes provide context against which expressions are evaluated.
+
 Refactored:
 
 ```js
-var app = angular.module('myApp', []);
+const app = angular.module('myApp', []);
 app.controller('myCtrl', $scope => ($scope.name = 'John Doe'));
 ```
 
@@ -524,7 +540,7 @@ app.controller('myCtrl', $scope => ($scope.name = 'John Doe'));
 
 'Custom tags' that can move templates in and out of html.
 
-myapp.js:
+In `myapp.js`:
 
 ```js
 import angular from 'angular';
@@ -539,7 +555,7 @@ angular.module('myApp').component('greetUser', {
 });
 ```
 
-`index.html`:
+In `index.html`:
 
 ```html
 <!DOCTYPE html>
@@ -565,14 +581,14 @@ import angular from 'angular';
 const app = angular.module('myApp', []);
 
 app.component('greetUser', {
-  template: `Hello, {{$ctrl.user}}!`,
+  template: `<h1>Hello, {{$ctrl.user}}!</h1>`,
   controller: function GreetUserController() {
     this.user = 'world';
   }
 });
 ```
 
-We can create multiple components and add custom tags.
+We can create multiple components and use our custom tags to display them in the DOM.
 
 ```js
 app.component('byeUser', {
@@ -592,6 +608,8 @@ app.component('byeUser', {
 
 ## Routing
 
+We will use routes defined in Angular to determine which component is displayed.
+
 npm install:
 
 `npm install angular-route@1.6.2 --save`
@@ -602,7 +620,11 @@ in `myapp.js`:
 
 Dependency injection:
 
+Add to `myapp`:
+
 `const app = angular.module('myApp', ['ngRoute']);`
+
+and configure it:
 
 ```js
 app.config(function config($routeProvider) {
@@ -623,7 +645,39 @@ app.config(function config($routeProvider) {
 </div>
 ```
 
-## Navbar
+Test with a link:
+
+```js
+template:`<h1><a href="#!/bye">Hello, {{$ctrl.user}}!</a></h1>`,
+```
+
+We can configure the app to use different urls by configuring the locationProvider:
+
+```js
+app.config(function config($locationProvider, $routeProvider) {
+  $routeProvider
+    .when('/', {
+      template: '<greet-user />'
+    })
+    .when('/bye', {
+      template: '<bye-user />'
+    })
+    .otherwise('/404');
+  $locationProvider.html5Mode(true);
+});
+```
+
+Be sure to add a base href to the index page:
+
+`<base href="/">`
+
+Test with a link:
+
+```js
+template:`<h1><a href="/bye">Hello, {{$ctrl.user}}!</a></h1>`,
+```
+
+## Import Data
 
 Recreate navitems.js in src:
 
@@ -721,6 +775,8 @@ At bottom of navItems:
 
 `export default navitems;`
 
+### Create the Navbar
+
 Import into `myapp.js`:
 
 ```js
@@ -745,9 +801,7 @@ app.controller('NavController', function($scope) {
 ...
 ```
 
-[Scope](https://docs.angularjs.org/guide/scope#!) is the glue between application controller and the view.
-
-Test to see if it is available in our view.
+Note that we have switched from using `app.component`s to `app.controller`s.
 
 Use Angular with the `ng-controller` and `ng-repeat` directives to build out again in index.html:
 
@@ -761,9 +815,30 @@ Use Angular with the `ng-controller` and `ng-repeat` directives to build out aga
 </nav>
 ```
 
-Build out the content.
+Test to see if the nav is available in our view.
 
-In index.html:
+Note that we could use a custom tag `<navbar></navbar>` if we componentized the navbar:
+
+```js
+app.component('navbar', {
+  template: `
+  <nav>
+    <ul id="nav-links">
+      <li data-ng-repeat="navitem in navitems">
+        <a href=#{{navitem.link}}>{{navitem.label}}</a>
+      </li>
+    </ul>
+  </nav>
+  `,
+  controller: function($scope) {
+    $scope.navitems = navitems;
+  }
+});
+```
+
+### Add Content to the DOM
+
+In `index.html`:
 
 ```html
 <div data-ng-controller="ContentController">
@@ -814,4 +889,3 @@ We can then use:
 `<div ng-bind-html="navitem.content"></div>`
 
 ## Notes
-
