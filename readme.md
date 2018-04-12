@@ -1,6 +1,6 @@
 # V - Express, Webpack, and Angular
 
-In this session we will explore using Express with Webpack for JavaScript bundling. We will use Angular as our templating language.
+In this session we will explore using Express with Webpack for JavaScript bundling. We will use Angular as our templating language and use modules.
 
 ## Homework
 
