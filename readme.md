@@ -349,6 +349,11 @@ Stop running the app and npm install angular:
 
 `npm install angular@1.6.2 --save`
 
+Back in the 'old' days you would use the `<script>` tag, e.g.:
+`<script src="https://code.angularjs.org/1.5.8/angular.js"></script>`
+
+This is still valid but you end up with a lot of scripts. Since we are using bundling we use ES6 imports.
+
 Import it into myapp.js:
 
 ```js
@@ -397,6 +402,10 @@ Simple Angular directives:
 ```
 
 This is a demonstration of [data binding](https://docs.angularjs.org/guide/databinding) and [filtering](https://docs.angularjs.org/api/ng/filter) to uppercase.
+
+`{{ }}` - moustaches or handlebars are similar to JavaScript Template Strings (`${ }`) and are Angular [expressions](https://docs.angularjs.org/guide/expression).
+
+`ng-repeat` is a directive. There are [many directives](https://docs.angularjs.org/api/).
 
 #### Using an Object
 
@@ -533,11 +542,19 @@ angular.module('myApp').component('greetUser', {
 `index.html`:
 
 ```html
+<!DOCTYPE html>
+<html lang="en" data-ng-app="myApp">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script src="js/bundle.js"></script>
+</head>
 <body>
-  <div ng-app="myApp">
+  <div>
     <greet-user></greet-user>
   </div>
 </body>
+</html>
 ```
 
 Refactor to use template strings and store the module in a variable:
@@ -555,26 +572,58 @@ app.component('greetUser', {
 });
 ```
 
-By creating multiple components we can switch out the content depending on the custom tag.
+We can create multiple components and add custom tags.
 
 ```js
 app.component('byeUser', {
   template: `Bye, {{$ctrl.user}}!`,
-  controller: function GreetUserController() {
+  controller: function ByeUserController() {
     this.user = 'cruel world';
   }
 });
 ```
 
 ```html
-  <div ng-app="myApp">
+  <div>
+    <greet-user></greet-user>
     <bye-user></bye-user>
   </div>
 ```
 
-<!-- This ends abruptly -->
+## Routing
 
-## PROCESS
+npm install:
+
+`npm install angular-route@1.6.2 --save`
+
+in `myapp.js`:
+
+`import ngRoute from 'angular-route';`
+
+Dependency injection:
+
+`const app = angular.module('myApp', ['ngRoute']);`
+
+```js
+app.config(function config($routeProvider) {
+  $routeProvider
+    .when('/', {
+      template: '<greet-user />'
+    })
+    .when('/bye', {
+      template: '<bye-user />'
+    })
+    .otherwise('/404');
+});
+```
+
+```html
+<div>
+    <div ng-view></div>
+</div>
+```
+
+## Navbar
 
 Recreate navitems.js in src:
 
@@ -680,42 +729,20 @@ import navitems from './src/navitems';
 console.log(navitems);
 ```
 
-<!-- Place a section of the page under the influence of a controller:
-
-```html
-<!DOCTYPE html>
-<html lang="en" data-ng-app="myApp">
-<head>
-  <meta charset="UTF-8">
-  <title>Document</title>
-  <script src="js/bundle.js"></script>
-</head>
-<body>
-  <nav data-ng-controller="NavController">
-
-  </nav>
-</body>
-</html>
-``` -->
-
-<!-- Declare app to be an instance of an Angular module (in myapp.js):
-
-`var app = angular.module('myApp', []);` -->
-
-<!-- `app` is the main Angular space and can be broken down into multiple controllers. -->
-
 Add our data to the NavController:
 
 ```js
 import angular from 'angular';
+import ngRoute from 'angular-route';
 import navitems from './src/navitems';
-console.log(navitems);
 
-var app = angular.module('myApp', []);
+const app = angular.module('myApp', ['ngRoute']);
 
 app.controller('NavController', function($scope) {
   $scope.navitems = navitems;
 });
+
+...
 ```
 
 [Scope](https://docs.angularjs.org/guide/scope#!) is the glue between application controller and the view.
@@ -725,30 +752,26 @@ Test to see if it is available in our view.
 Use Angular with the `ng-controller` and `ng-repeat` directives to build out again in index.html:
 
 ```html
-  <nav data-ng-controller="NavController">
-    <ul id="nav-links">
-      <li data-ng-repeat="navitem in navitems">
-        <a href=#{{navitem.link}}>{{navitem.label}}</a>
-      </li>
-    </ul>
-  </nav>
+<nav data-ng-controller="NavController">
+  <ul id="nav-links">
+    <li data-ng-repeat="navitem in navitems">
+      <a href=#{{navitem.link}}>{{navitem.label}}</a>
+    </li>
+  </ul>
+</nav>
 ```
-
-`{{ }}` - moustaches or handlebars are similar to JavaScript Template Strings (`${ }`). These are known as [expressions](https://docs.angularjs.org/guide/expression).
-
-`ng-repeat` is a directive. There are [many directives](https://docs.angularjs.org/api/).
 
 Build out the content.
 
 In index.html:
 
 ```html
-  <div data-ng-controller="ContentController">
-    <div data-ng-repeat="navitem in navitems">
-      <h2>{{ navitem.label }}</h2>
-      <h3>{{ navitem.header }}</h3>
-    </div>
+<div data-ng-controller="ContentController">
+  <div data-ng-repeat="navitem in navitems">
+    <h2>{{ navitem.label }}</h2>
+    <h3>{{ navitem.header }}</h3>
   </div>
+</div>
 ```
 
 In myapp.js:
@@ -773,12 +796,7 @@ Try adding `{{ navitem.content }}`:
   </div>
 ```
 
-Load [sanitize](https://docs.angularjs.org/api/ngSanitize):
-
-Back in the 'old' days you would use the `<script>` ta, e.g.:
-`<script src="https://code.angularjs.org/1.5.8/angular-sanitize.min.js"></script>`
-
-Today we are using webpack and bundling
+Install [sanitize](https://docs.angularjs.org/api/ngSanitize):
 
 `npm install angular-sanitize@1.6.2 --save`
 
@@ -789,7 +807,7 @@ import ngSanitize from 'angular-sanitize';
 
 Use [injection](https://docs.angularjs.org/guide/di) to make it available to the app:
 
-`var app = angular.module('myApp', ['ngSanitize']);`
+`const app = angular.module('myApp', ['ngRoute', 'ngSanitize']);`
 
 We can then use:
 
@@ -797,20 +815,3 @@ We can then use:
 
 ## Notes
 
-```js
-const navbar = document.querySelector('nav');
-const markup = `
-<ul>
-${navitems.map(navitem => `<li><a href="${navitem.link}">${navitem.label}</a></li>`).join('')}
-</ul>
-`;
-navbar.innerHTML = markup;
-
-console.log(navbar);
-```
-
-`npm install angular-route@1.6.2 --save`
-
-`import ngRoute from 'angular-route';`
-
-`var app = angular.module('myApp', [ngRoute, ngSanitize]);`
