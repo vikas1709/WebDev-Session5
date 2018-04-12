@@ -322,7 +322,7 @@ export default apiKey;
 
 ## Angular as a Templating Engine
 
-Let's look at using an older - but still common and actively maintained - version of Angular as our page templating language.
+Let's look at using an older - but still common and actively maintained - version of Angular as our page templating language. The documentation for the features we will be using is located [here](https://docs.angularjs.org/guide).
 
 Disable views and view engine in `app.js`:
 
