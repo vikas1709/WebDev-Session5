@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="myApp">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script src="js/bundle.js"></script>
+  <base href="/">
+</head>
+<body>
+        <nav data-ng-controller="NavController">
+                <ul id="nav-links">
+                  <li data-ng-repeat="navitem in navitems">
+                    <a href=#{{navitem.link}}>{{navitem.label}}</a>
+                  </li>
+                </ul>
+              </nav>
+  <div>
+    <div ng-view></div>
+  </div>
+  <div data-ng-controller="ContentController">
+        <div data-ng-repeat="navitem in navitems">
+          <h2>{{ navitem.label }}</h2>
+          <h3>{{ navitem.header }}</h3>
+          <div ng-bind-html="navitem.content"></div>
+        </div>
+      </div>
+    
+</body>
+</html>
